@@ -16,7 +16,7 @@ public class JokoButton: UIButton {
     }
     
     private var bgColor: UIColor {
-        isEnabled ? .gray900 : .gray500
+        isEnabled ? .gray900 : .main
     }
 
     override public init(frame: CGRect) {

@@ -1,6 +1,6 @@
 import UIKit
 
-class ViewController: UIViewController {
+class LoginViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -9,4 +9,3 @@ class ViewController: UIViewController {
 
 
 }
-

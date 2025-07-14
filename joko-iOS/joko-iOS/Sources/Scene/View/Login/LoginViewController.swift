@@ -16,6 +16,10 @@ public class LoginViewController: BaseViewController<LoginViewModel> {
         $0.textColor = .gray400
     }
 
+    private let signUpButton = JokoUnderlineButton(
+        buttonText: "회원가입"
+    )
+
     private let loginButton = JokoButton(
         buttonText: "로그인하기",
         isHidden: false
@@ -25,6 +29,7 @@ public class LoginViewController: BaseViewController<LoginViewModel> {
         [
             titleLabel,
             nonAccountLabel,
+            signUpButton,
             loginButton
         ].forEach { view.addSubview($0) }
     }
@@ -41,7 +46,11 @@ public class LoginViewController: BaseViewController<LoginViewModel> {
         nonAccountLabel.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(572)
             $0.leading.trailing.equalToSuperview().inset(112)
-            
+        }
+        signUpButton.snp.makeConstraints {
+            $0.top.equalTo(titleLabel.snp.bottom).offset(572)
+            $0.leading.equalTo(nonAccountLabel.snp.trailing).inset(8)
+            $0.width.equalTo(42)
         }
         loginButton.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(604)

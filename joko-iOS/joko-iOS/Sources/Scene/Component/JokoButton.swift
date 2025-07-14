@@ -29,7 +29,7 @@ public class JokoButton: UIButton {
         buttonText: String? = String(),
         isEnabled: Bool? = true,
         isHidden: Bool? = false,
-        height: CGFloat? = 47
+        height: CGFloat? = 52
     ) {
         self.init(frame: .zero)
         self.setTitle(buttonText, for: .normal)
@@ -57,8 +57,8 @@ public class JokoButton: UIButton {
 
     private func attribute() {
         self.backgroundColor = bgColor
-        self.setTitleColor(.modeWhite, for: .normal)
-        self.titleLabel?.font = .pickFont(.button1)
+        self.setTitleColor(.background, for: .normal)
+        self.titleLabel?.font = .JokoFont(.button)
         self.layer.cornerRadius = 8
     }
 }

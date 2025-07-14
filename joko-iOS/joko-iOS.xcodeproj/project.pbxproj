@@ -12,6 +12,8 @@
 		6F4ACF6B2E250F7800816139 /* RxBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 6F4ACF6A2E250F7800816139 /* RxBlocking */; };
 		6F4ACF6D2E250F7800816139 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 6F4ACF6C2E250F7800816139 /* RxCocoa */; };
 		6F4ACF6F2E250F7800816139 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 6F4ACF6E2E250F7800816139 /* RxRelay */; };
+		6F4ACF742E25111B00816139 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 6F4ACF732E25111B00816139 /* Moya */; };
+		6F4ACF762E25111B00816139 /* RxMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 6F4ACF752E25111B00816139 /* RxMoya */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,7 +48,9 @@
 			files = (
 				6F4ACF6F2E250F7800816139 /* RxRelay in Frameworks */,
 				6F4ACF562E250ABD00816139 /* Then in Frameworks */,
+				6F4ACF742E25111B00816139 /* Moya in Frameworks */,
 				6F4ACF6B2E250F7800816139 /* RxBlocking in Frameworks */,
+				6F4ACF762E25111B00816139 /* RxMoya in Frameworks */,
 				6F4ACF6D2E250F7800816139 /* RxCocoa in Frameworks */,
 				6F4ACF592E250ACA00816139 /* SnapKit in Frameworks */,
 			);
@@ -96,6 +100,8 @@
 				6F4ACF6A2E250F7800816139 /* RxBlocking */,
 				6F4ACF6C2E250F7800816139 /* RxCocoa */,
 				6F4ACF6E2E250F7800816139 /* RxRelay */,
+				6F4ACF732E25111B00816139 /* Moya */,
+				6F4ACF752E25111B00816139 /* RxMoya */,
 			);
 			productName = "joko-iOS";
 			productReference = 6F4ACF392E25094600816139 /* joko-iOS.app */;
@@ -129,6 +135,7 @@
 				6F4ACF542E250ABD00816139 /* XCRemoteSwiftPackageReference "Then" */,
 				6F4ACF572E250ACA00816139 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				6F4ACF692E250F7800816139 /* XCRemoteSwiftPackageReference "RxSwift" */,
+				6F4ACF722E25111B00816139 /* XCRemoteSwiftPackageReference "Moya" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6F4ACF3A2E25094600816139 /* Products */;
@@ -384,6 +391,14 @@
 				minimumVersion = 6.9.0;
 			};
 		};
+		6F4ACF722E25111B00816139 /* XCRemoteSwiftPackageReference "Moya" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Moya/Moya.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 15.0.3;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -411,6 +426,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6F4ACF692E250F7800816139 /* XCRemoteSwiftPackageReference "RxSwift" */;
 			productName = RxRelay;
+		};
+		6F4ACF732E25111B00816139 /* Moya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6F4ACF722E25111B00816139 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = Moya;
+		};
+		6F4ACF752E25111B00816139 /* RxMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6F4ACF722E25111B00816139 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = RxMoya;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -1,11 +1,7 @@
 import UIKit
 
-class SignUpViewController: UIViewController {
+class SignUpViewController: BaseViewController<BaseViewModel> {
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .red
-    }
 
 
 }

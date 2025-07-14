@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		6F4ACF562E250ABD00816139 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 6F4ACF552E250ABD00816139 /* Then */; };
+		6F4ACF592E250ACA00816139 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6F4ACF582E250ACA00816139 /* SnapKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		6F4ACF392E25094600816139 /* joko-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "joko-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -14,7 +19,7 @@
 		6F4ACF4B2E25094700816139 /* Exceptions for "joko-iOS" folder in "joko-iOS" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				Resources/Info.plist,
 			);
 			target = 6F4ACF382E25094600816139 /* joko-iOS */;
 		};
@@ -36,6 +41,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6F4ACF562E250ABD00816139 /* Then in Frameworks */,
+				6F4ACF592E250ACA00816139 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +85,8 @@
 			);
 			name = "joko-iOS";
 			packageProductDependencies = (
+				6F4ACF552E250ABD00816139 /* Then */,
+				6F4ACF582E250ACA00816139 /* SnapKit */,
 			);
 			productName = "joko-iOS";
 			productReference = 6F4ACF392E25094600816139 /* joko-iOS.app */;
@@ -107,6 +116,10 @@
 			);
 			mainGroup = 6F4ACF302E25094600816139;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				6F4ACF542E250ABD00816139 /* XCRemoteSwiftPackageReference "Then" */,
+				6F4ACF572E250ACA00816139 /* XCRemoteSwiftPackageReference "SnapKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6F4ACF3A2E25094600816139 /* Products */;
 			projectDirPath = "";
@@ -335,6 +348,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		6F4ACF542E250ABD00816139 /* XCRemoteSwiftPackageReference "Then" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/devxoul/Then";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
+		6F4ACF572E250ACA00816139 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6F4ACF552E250ABD00816139 /* Then */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6F4ACF542E250ABD00816139 /* XCRemoteSwiftPackageReference "Then" */;
+			productName = Then;
+		};
+		6F4ACF582E250ACA00816139 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6F4ACF572E250ACA00816139 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6F4ACF312E25094600816139 /* Project object */;
 }

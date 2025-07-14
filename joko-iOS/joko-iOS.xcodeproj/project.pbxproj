@@ -7,32 +7,32 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		6F4D5F962E24F6EE00A323B3 /* JOKO_iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JOKO_iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6F4ACF392E25094600816139 /* joko-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "joko-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		6F4D5FA82E24F6EF00A323B3 /* Exceptions for "JOKO_iOS" folder in "JOKO_iOS" target */ = {
+		6F4ACF4B2E25094700816139 /* Exceptions for "joko-iOS" folder in "joko-iOS" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 6F4D5F952E24F6EE00A323B3 /* JOKO_iOS */;
+			target = 6F4ACF382E25094600816139 /* joko-iOS */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		6F4D5F982E24F6EE00A323B3 /* JOKO_iOS */ = {
+		6F4ACF3B2E25094600816139 /* joko-iOS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				6F4D5FA82E24F6EF00A323B3 /* Exceptions for "JOKO_iOS" folder in "JOKO_iOS" target */,
+				6F4ACF4B2E25094700816139 /* Exceptions for "joko-iOS" folder in "joko-iOS" target */,
 			);
-			path = JOKO_iOS;
+			path = "joko-iOS";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		6F4D5F932E24F6EE00A323B3 /* Frameworks */ = {
+		6F4ACF362E25094600816139 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -42,18 +42,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		6F4D5F8D2E24F6EE00A323B3 = {
+		6F4ACF302E25094600816139 = {
 			isa = PBXGroup;
 			children = (
-				6F4D5F982E24F6EE00A323B3 /* JOKO_iOS */,
-				6F4D5F972E24F6EE00A323B3 /* Products */,
+				6F4ACF3B2E25094600816139 /* joko-iOS */,
+				6F4ACF3A2E25094600816139 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		6F4D5F972E24F6EE00A323B3 /* Products */ = {
+		6F4ACF3A2E25094600816139 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6F4D5F962E24F6EE00A323B3 /* JOKO_iOS.app */,
+				6F4ACF392E25094600816139 /* joko-iOS.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -61,64 +61,64 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		6F4D5F952E24F6EE00A323B3 /* JOKO_iOS */ = {
+		6F4ACF382E25094600816139 /* joko-iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6F4D5FA92E24F6EF00A323B3 /* Build configuration list for PBXNativeTarget "JOKO_iOS" */;
+			buildConfigurationList = 6F4ACF4C2E25094700816139 /* Build configuration list for PBXNativeTarget "joko-iOS" */;
 			buildPhases = (
-				6F4D5F922E24F6EE00A323B3 /* Sources */,
-				6F4D5F932E24F6EE00A323B3 /* Frameworks */,
-				6F4D5F942E24F6EE00A323B3 /* Resources */,
+				6F4ACF352E25094600816139 /* Sources */,
+				6F4ACF362E25094600816139 /* Frameworks */,
+				6F4ACF372E25094600816139 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				6F4D5F982E24F6EE00A323B3 /* JOKO_iOS */,
+				6F4ACF3B2E25094600816139 /* joko-iOS */,
 			);
-			name = JOKO_iOS;
+			name = "joko-iOS";
 			packageProductDependencies = (
 			);
-			productName = JOKO_iOS;
-			productReference = 6F4D5F962E24F6EE00A323B3 /* JOKO_iOS.app */;
+			productName = "joko-iOS";
+			productReference = 6F4ACF392E25094600816139 /* joko-iOS.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		6F4D5F8E2E24F6EE00A323B3 /* Project object */ = {
+		6F4ACF312E25094600816139 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
-					6F4D5F952E24F6EE00A323B3 = {
+					6F4ACF382E25094600816139 = {
 						CreatedOnToolsVersion = 16.4;
 					};
 				};
 			};
-			buildConfigurationList = 6F4D5F912E24F6EE00A323B3 /* Build configuration list for PBXProject "JOKO_iOS" */;
+			buildConfigurationList = 6F4ACF342E25094600816139 /* Build configuration list for PBXProject "joko-iOS" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = 6F4D5F8D2E24F6EE00A323B3;
+			mainGroup = 6F4ACF302E25094600816139;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 6F4D5F972E24F6EE00A323B3 /* Products */;
+			productRefGroup = 6F4ACF3A2E25094600816139 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				6F4D5F952E24F6EE00A323B3 /* JOKO_iOS */,
+				6F4ACF382E25094600816139 /* joko-iOS */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		6F4D5F942E24F6EE00A323B3 /* Resources */ = {
+		6F4ACF372E25094600816139 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -128,7 +128,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		6F4D5F922E24F6EE00A323B3 /* Sources */ = {
+		6F4ACF352E25094600816139 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -138,7 +138,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		6F4D5FAA2E24F6EF00A323B3 /* Debug */ = {
+		6F4ACF4D2E25094700816139 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -147,7 +147,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3DFKU6DVCR;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = JOKO_iOS/Info.plist;
+				INFOPLIST_FILE = "joko-iOS/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -158,7 +158,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.jh.JOKO-iOS";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.jh.joko-iOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -166,7 +166,7 @@
 			};
 			name = Debug;
 		};
-		6F4D5FAB2E24F6EF00A323B3 /* Release */ = {
+		6F4ACF4E2E25094700816139 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -175,7 +175,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3DFKU6DVCR;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = JOKO_iOS/Info.plist;
+				INFOPLIST_FILE = "joko-iOS/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -186,7 +186,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.jh.JOKO-iOS";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.jh.joko-iOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -194,7 +194,7 @@
 			};
 			name = Release;
 		};
-		6F4D5FAC2E24F6EF00A323B3 /* Debug */ = {
+		6F4ACF4F2E25094700816139 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -258,7 +258,7 @@
 			};
 			name = Debug;
 		};
-		6F4D5FAD2E24F6EF00A323B3 /* Release */ = {
+		6F4ACF502E25094700816139 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -318,25 +318,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		6F4D5F912E24F6EE00A323B3 /* Build configuration list for PBXProject "JOKO_iOS" */ = {
+		6F4ACF342E25094600816139 /* Build configuration list for PBXProject "joko-iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				6F4D5FAC2E24F6EF00A323B3 /* Debug */,
-				6F4D5FAD2E24F6EF00A323B3 /* Release */,
+				6F4ACF4F2E25094700816139 /* Debug */,
+				6F4ACF502E25094700816139 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6F4D5FA92E24F6EF00A323B3 /* Build configuration list for PBXNativeTarget "JOKO_iOS" */ = {
+		6F4ACF4C2E25094700816139 /* Build configuration list for PBXNativeTarget "joko-iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				6F4D5FAA2E24F6EF00A323B3 /* Debug */,
-				6F4D5FAB2E24F6EF00A323B3 /* Release */,
+				6F4ACF4D2E25094700816139 /* Debug */,
+				6F4ACF4E2E25094700816139 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 6F4D5F8E2E24F6EE00A323B3 /* Project object */;
+	rootObject = 6F4ACF312E25094600816139 /* Project object */;
 }

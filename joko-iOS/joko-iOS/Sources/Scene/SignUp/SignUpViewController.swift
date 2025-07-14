@@ -1,8 +1,7 @@
 import UIKit
 
-class SignUpViewController: BaseViewController<BaseViewModel> {
-
-
+public class SignUpViewController: BaseViewController<BaseViewModel> {
+    private let 
 
 }
 

@@ -56,8 +56,8 @@ public class JokoButton: UIButton {
     }
 
     private func attribute() {
-        self.backgroundColor = bgColor
-        self.setTitleColor(.background, for: .normal)
+        self.backgroundColor = .gray900
+        self.setTitleColor(.gray500, for: .normal)
         self.titleLabel?.font = .JokoFont(.button)
         self.layer.cornerRadius = 8
     }

@@ -1,52 +1,38 @@
 import UIKit
 
-public enum PiCKTabBarType: Int {
-    case home, schoolMeal, apply, schedule, allTab
+public enum JokoTabBarType: Int {
+    case home, quiz, mypage
 
     func tabItemTuple() -> TabItemInfo {
         switch self {
         case .home:
             return .init(
                 title: "홈",
-                image: .homeIcon,
-                selectedImage: .homeIcon,
+                image: .home,
+                selectedImage: .selectHome,
                 tag: 0
             )
-        case .schoolMeal:
+        case .quiz:
             return .init(
-                title: "급식",
-                image: .schoolMealIcon,
-                selectedImage: .schoolMealIcon,
+                title: "퀴즈",
+                image: .quiz,
+                selectedImage: .selectQuiz,
                 tag: 1
             )
-        case .apply:
+        case .mypage:
             return .init(
-                title: "신청",
-                image: .applyIcon,
-                selectedImage: .applyIcon,
+                title: "마이페이지",
+                image: .mypage,
+                selectedImage: .selectMypage,
                 tag: 2
-            )
-        case .schedule:
-            return .init(
-                title: "일정",
-                image: .scheduleIcon,
-                selectedImage: .scheduleIcon,
-                tag: 3
-            )
-        case .allTab:
-            return .init(
-                title: "전체",
-                image: .allTabIcon,
-                selectedImage: .allTabIcon,
-                tag: 3
             )
         }
     }
 
 }
 
-public class PiCkTabBarTypeItem: UITabBarItem {
-    public init(_ type: PiCKTabBarType) {
+public class JokoTabBarTypeItem: UITabBarItem {
+    public init(_ type: JokoTabBarType) {
         super.init()
         let info = type.tabItemTuple()
 

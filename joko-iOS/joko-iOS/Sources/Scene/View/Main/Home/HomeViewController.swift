@@ -3,6 +3,7 @@ import SnapKit
 import Then
 
 final class HomeViewController: BaseViewController<HomeViewModel> {
+    private let navigationBar = JokoMainNavigationBar()
     private let topSkyView = UIView().then {
         $0.backgroundColor = .skyblue
     }
@@ -24,16 +25,24 @@ final class HomeViewController: BaseViewController<HomeViewModel> {
             topSkyView,
             cloudImageView,
             cloudImageView2,
-            bottomBackView
+            bottomBackView,
+            navigationBar
         ].forEach { view.addSubview($0) }
     }
     
     public override func attribute() {
         view.backgroundColor = .background
+        navigationBar.backgroundColor = .clear
         hideKeyboardWhenTappedAround()
     }
     
     public override func setLayout() {
+        navigationBar.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.trailing.equalToSuperview()
+            $0.height.equalTo(60)
+        }
+
         topSkyView.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.leading.equalToSuperview()

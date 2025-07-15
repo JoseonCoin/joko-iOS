@@ -5,10 +5,12 @@ public extension UIFont {
     static func JokoFont(_ font: JokoFontStyle) -> UIFont {
         return font.uiFont()
     }
-    
-    // Convenience method for custom sizes
+
     static func JokoFont(_ font: JokoFontStyle, size: CGFloat) -> UIFont {
         return font.uiFont(customSize: size)
+    }
+    static func chosunFont(size: CGFloat) -> UIFont {
+        return UIFont(name: "ChosunCentennial", size: size) ?? UIFont.systemFont(ofSize: size)
     }
 }
 
@@ -177,12 +179,12 @@ extension JokoFontStyle {
 
 // MARK: - Additional Typography Helpers
 public extension UIFont {
-    // Create attributed string with proper line height
     func attributedString(from text: String, style: JokoFontStyle) -> NSAttributedString {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineSpacing = style.lineHeight() - style.size()
         paragraphStyle.minimumLineHeight = style.lineHeight()
         paragraphStyle.maximumLineHeight = style.lineHeight()
+        
         
         let attributes: [NSAttributedString.Key: Any] = [
             .font: self,
@@ -203,8 +205,10 @@ public class JokoFontLoader {
             "WantedSans-ExtraBold",
             "WantedSans-Medium",
             "WantedSans-Regular",
-            "WantedSans-SemiBold"
+            "WantedSans-SemiBold",
+            "ChosunCentennial"
         ]
+
         
         for fontName in fontNames {
             guard let fontURL = Bundle.main.url(forResource: fontName, withExtension: "ttf") ?? Bundle.main.url(forResource: fontName, withExtension: "otf") else {

@@ -3,8 +3,6 @@ import SnapKit
 import Then
 
 public class JokoMainNavigationBar: UIView {
-    
-    // MARK: - Properties
     weak var parentViewController: UIViewController?
     
     private let sinceBackView = UIView().then {
@@ -21,11 +19,20 @@ public class JokoMainNavigationBar: UIView {
         $0.setImage(UIImage(named: "underbutton"), for: .normal)
     }
     
+    private let sideBackView = UIView().then {
+        $0.backgroundColor = .gray400
+        $0.layer.cornerRadius = 12
+    }
+    
+    private let shopButton = UIImageView().then {
+        $0.image = UIImage(named: "shop")?.withRenderingMode(.alwaysOriginal)
+        $0.isUserInteractionEnabled = true
+    }
+    
     public override var intrinsicContentSize: CGSize {
         return CGSize(width: 390, height: 44)
     }
     
-    // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
         layout()
@@ -36,7 +43,6 @@ public class JokoMainNavigationBar: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Setup
     private func layout() {
         addSubview(sinceBackView)
         sinceBackView.snp.makeConstraints {
@@ -57,6 +63,21 @@ public class JokoMainNavigationBar: UIView {
             $0.trailing.equalToSuperview()
             $0.width.height.equalTo(24)
         }
+        
+        addSubview(sideBackView)
+        sideBackView.snp.makeConstraints {
+            $0.trailing.equalToSuperview().inset(20)
+            $0.centerY.equalToSuperview()
+            $0.width.equalTo(44)
+            $0.height.equalTo(36)
+        }
+        
+        sideBackView.addSubview(shopButton)
+        shopButton.snp.makeConstraints {
+            $0.center.equalToSuperview()
+            $0.width.equalTo(20)
+            $0.height.equalTo(17.92)
+        }
     }
     
     private func setupGesture() {
@@ -64,9 +85,11 @@ public class JokoMainNavigationBar: UIView {
         longPressGesture.minimumPressDuration = 0.0
         sinceBackView.addGestureRecognizer(longPressGesture)
         sinceBackView.isUserInteractionEnabled = true
+
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(shopButtonTapped))
+        shopButton.addGestureRecognizer(tapGesture)
     }
     
-    // MARK: - Actions
     @objc private func sinceBackViewPressed(_ gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
@@ -85,6 +108,20 @@ public class JokoMainNavigationBar: UIView {
         default:
             break
         }
+    }
+    
+    @objc private func shopButtonTapped() {
+        // shopButton 탭 애니메이션 (선택사항)
+        UIView.animate(withDuration: 0.1, animations: {
+            self.shopButton.alpha = 0.7
+        }) { _ in
+            UIView.animate(withDuration: 0.1) {
+                self.shopButton.alpha = 1.0
+            }
+        }
+        
+        // ShopViewController로 push 이동
+        pushToShopViewController()
     }
     
     private func presentChangeEraViewController() {
@@ -106,6 +143,20 @@ public class JokoMainNavigationBar: UIView {
         
         DispatchQueue.main.async {
             parentVC.present(changeEraVC, animated: true)
+        }
+    }
+    
+    private func pushToShopViewController() {
+        guard let parentVC = parentViewController else { return }
+        let shopVC = ShopViewController(viewModel: ShopViewModel())
+        if let navigationController = parentVC.navigationController {
+            DispatchQueue.main.async {
+                navigationController.pushViewController(shopVC, animated: true)
+            }
+        } else {
+            DispatchQueue.main.async {
+                parentVC.present(shopVC, animated: true)
+            }
         }
     }
 }

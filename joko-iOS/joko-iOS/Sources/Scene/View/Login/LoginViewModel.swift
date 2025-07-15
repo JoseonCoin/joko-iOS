@@ -85,23 +85,30 @@ public class LoginViewModel: BaseViewModel {
                 print("🟢 응답 성공 - 상태 코드: \(response.statusCode)")
                 print("🟢 응답 본문: \(String(data: response.data, encoding: .utf8) ?? "없음")")
 
-                // 상태 코드별 처리
                 if response.statusCode == 200 {
                     do {
                         let decoded = try JSONDecoder().decode(LoginResponse.self, from: response.data)
                         print("🟢 디코딩 성공")
-                        
+
+                        // ✅ accessToken 저장
                         UserDefaults.standard.set(decoded.accessToken, forKey: "access_token")
                         UserDefaults.standard.set(decoded.refreshToken, forKey: "refresh_token")
-                        
+
+                        // ✅ userId 디코딩 및 저장
+                        if let payload = decodeJWT(decoded.accessToken),
+                           let userId = payload["userId"] as? Int {
+                            print("✅ 디코딩된 userId: \(userId)")
+                            UserDefaults.standard.set(userId, forKey: "user_id")
+                        } else {
+                            print("❌ userId 디코딩 실패")
+                        }
+
+                        // ✅ 성공 이벤트 전달
                         self.loginSuccessSubject.onNext(())
                     } catch {
                         print("🔴 디코딩 오류: \(error)")
                         self.loginErrorSubject.onNext("응답 파싱 실패")
                     }
-                } else {
-                    print("🔴 HTTP 오류 상태 코드: \(response.statusCode)")
-                    self.loginErrorSubject.onNext("로그인 실패 (상태 코드: \(response.statusCode))")
                 }
 
             case .failure(let error):

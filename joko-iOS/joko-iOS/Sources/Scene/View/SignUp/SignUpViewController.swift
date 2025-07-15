@@ -13,16 +13,14 @@ public class SignUpViewController: BaseViewController<SignUpViewModel> {
         $0.textColor = .white
         $0.numberOfLines = 0
     }
-    
     private let nickNameTextField = JokoTextField(type: .name)
     private let idTextField = JokoTextField(type: .id)
     private let passwordTextField = JokoTextField(type: .pw)
-    
     private let signUpButton = JokoButton(
         buttonText: "회원가입하기",
         isHidden: false
     )
-    
+ 
     public override func attribute() {
         super.attribute()
         view.backgroundColor = .background

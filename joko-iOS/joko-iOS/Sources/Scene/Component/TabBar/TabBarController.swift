@@ -1,10 +1,10 @@
 import UIKit
 
-public class MainTabBarController2: BaseTabBarController {
+public class TabBarController: BaseTabBarController {
     override public func viewDidLoad() {
         super.viewDidLoad()
         self.animationType = .slide
-        let homeVC = UINavigationController(rootViewController: HomeViewController())
+        let homeVC = UINavigationController(rootViewController: HomeViewController(viewModel: HomeViewModel()))
         homeVC.tabBarItem = JokoTabBarTypeItem(.home)
         
         let quizVC = UINavigationController(rootViewController: QuizViewController())

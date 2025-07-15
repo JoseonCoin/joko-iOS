@@ -25,10 +25,9 @@ public class LoginViewModel: BaseViewModel {
     private let loginErrorSubject = PublishSubject<String>()
     private let disposeBag = DisposeBag()
 
-    // 타임아웃 설정을 포함한 프로바이더
     private lazy var provider: MoyaProvider<LoginAPI> = {
         let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 30 // 30초 타임아웃
+        configuration.timeoutIntervalForRequest = 30
         configuration.timeoutIntervalForResource = 30
         
         let session = Session(configuration: configuration)

@@ -149,7 +149,7 @@ public class LoginViewController: BaseViewController<LoginViewModel> {
             guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                   let sceneDelegate = scene.delegate as? SceneDelegate else { return }
 
-            let tabBarController = MainTabBarController2()  // BaseTabBarController 상속한 클래스
+            let tabBarController = TabBarController()  // BaseTabBarController 상속한 클래스
             UIView.transition(with: sceneDelegate.window!,
                               duration: 0.3,
                               options: .transitionCrossDissolve,

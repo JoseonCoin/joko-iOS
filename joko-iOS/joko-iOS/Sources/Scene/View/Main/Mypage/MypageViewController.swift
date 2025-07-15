@@ -31,11 +31,9 @@ final class MyPageViewController: UIViewController {
     }
 
     private func logout() {
-        // 1. 토큰 삭제
         UserDefaults.standard.removeObject(forKey: "access_token")
         UserDefaults.standard.removeObject(forKey: "refresh_token")
 
-        // 2. 로그인 화면으로 전환
         guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let sceneDelegate = scene.delegate as? SceneDelegate else { return }
 

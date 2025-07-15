@@ -27,13 +27,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
-        let viewController = MainTabBarController2()
+        let viewController = TabBarController()
         window?.rootViewController = viewController
         window?.makeKeyAndVisible()
     }
     
     func switchToMainTabBar() {
-        let tabBarController = MainTabBarController2()
+        let tabBarController = TabBarController()
 
         UIView.transition(with: window!, duration: 0.5, options: [.transitionFlipFromRight], animations: {
             self.window?.rootViewController = tabBarController

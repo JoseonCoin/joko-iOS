@@ -3,8 +3,10 @@ import SnapKit
 import Then
 import RxSwift
 import RxCocoa
+import Moya
 
 public class LoginViewController: BaseViewController<LoginViewModel> {
+    let provider = MoyaProvider<LoginAPI>(plugins: [MoyaLoggingPlugin()])
     private let titleLabel = UILabel().then {
         $0.font = UIFont.JokoFont(.title2)
         $0.text = "로그인하고\n조코 사용하기"
@@ -157,8 +159,16 @@ public class LoginViewController: BaseViewController<LoginViewModel> {
 
     private func navigateToSignUp() {
         print("회원가입 버튼 클릭")
-        // 예시 코드
-        // let signUpVC = SignUpViewController()
-        // navigationController?.pushViewController(signUpVC, animated: true)
+
+        let signUpVC = SignUpViewController(viewModel: SignUpViewModel())
+
+        if let navController = navigationController {
+            // NavigationController가 있으면 push
+            navController.pushViewController(signUpVC, animated: true)
+        } else {
+            // NavigationController가 없으면 새로 생성해서 present
+            let navController = UINavigationController(rootViewController: signUpVC)
+            present(navController, animated: true)
+        }
     }
 }

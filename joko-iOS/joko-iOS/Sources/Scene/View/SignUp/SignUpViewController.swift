@@ -65,8 +65,7 @@ public class SignUpViewController: BaseViewController<SignUpViewModel> {
             $0.leading.trailing.equalToSuperview().inset(20)
         }
     }
-    
-    // MARK: - Binding
+
     public override func bind() {
         let input = SignUpViewModel.Input(
             username: nickNameTextField.textField.rx.text.orEmpty.asDriver(),
@@ -76,16 +75,14 @@ public class SignUpViewController: BaseViewController<SignUpViewModel> {
         )
         
         let output = viewModel.transform(input: input)
-        
-        // 회원가입 버튼 활성화
+
         output.isSignUpEnabled
             .drive(onNext: { [weak self] isEnabled in
                 self?.signUpButton.isEnabled = isEnabled
                 self?.signUpButton.alpha = isEnabled ? 1.0 : 0.5
             })
             .disposed(by: disposeBag)
-        
-        // 로딩 처리
+
         output.isLoading
             .drive(onNext: { [weak self] isLoading in
                 if isLoading {
@@ -95,15 +92,13 @@ public class SignUpViewController: BaseViewController<SignUpViewModel> {
                 }
             })
             .disposed(by: disposeBag)
-        
-        // 회원가입 성공
+
         output.signUpSuccess
             .drive(onNext: { [weak self] in
                 self?.signUpSuccess()
             })
             .disposed(by: disposeBag)
-        
-        // 회원가입 실패
+
         output.signUpError
             .drive(onNext: { [weak self] errorMessage in
                 self?.showAlert(title: "회원가입 실패", message: errorMessage)

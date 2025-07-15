@@ -59,13 +59,10 @@ public class SignUpViewModel: BaseViewModel {
             case .success(let response):
                 switch response.statusCode {
                 case 201:
-                    // 회원가입 성공
                     self?.signUpSuccessSubject.onNext(())
                 case 400:
-                    // 잘못된 요청
                     self?.signUpErrorSubject.onNext("요청 데이터가 잘못되었습니다.")
                 case 500:
-                    // 서버 오류
                     self?.signUpErrorSubject.onNext("서버 오류가 발생했습니다.")
                 default:
                     self?.signUpErrorSubject.onNext("회원가입에 실패했습니다.")

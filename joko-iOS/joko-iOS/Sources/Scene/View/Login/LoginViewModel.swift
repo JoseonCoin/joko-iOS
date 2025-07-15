@@ -49,24 +49,34 @@ public class LoginViewModel: BaseViewModel {
 
     private func login(accountId: String, password: String) {
         isLoadingSubject.onNext(true)
+
         provider.request(.login(accountId: accountId, password: password)) { [weak self] result in
-            self?.isLoadingSubject.onNext(false)
+            guard let self = self else { return }
+            self.isLoadingSubject.onNext(false)
+
             switch result {
             case .success(let response):
+                print("응답 상태 코드:", response.statusCode)
+                print("응답 본문:", String(data: response.data, encoding: .utf8) ?? "없음")
+
                 do {
-                    let json = try JSONSerialization.jsonObject(with: response.data) as? [String: Any]
-                    if let token = json?["token"] as? String {
-                        UserDefaults.standard.set(token, forKey: "access_token")
-                        self?.loginSuccessSubject.onNext(())
-                    } else {
-                        self?.loginErrorSubject.onNext("토큰 없음")
-                    }
+                    let decoded = try JSONDecoder().decode(LoginResponse.self, from: response.data)
+
+                    UserDefaults.standard.set(decoded.accessToken, forKey: "access_token")
+                    UserDefaults.standard.set(decoded.refreshToken, forKey: "refresh_token")
+
+                    self.loginSuccessSubject.onNext(())
                 } catch {
-                    self?.loginErrorSubject.onNext("응답 파싱 실패")
+                    print("디코딩 오류:", error)
+                    self.loginErrorSubject.onNext("응답 파싱 실패")
                 }
-            case .failure:
-                self?.loginErrorSubject.onNext("로그인 요청 실패")
+
+            case .failure(let error):
+                print("요청 실패 상태 코드:", error.response?.statusCode ?? -1)
+                print("에러 응답:", String(data: error.response?.data ?? Data(), encoding: .utf8) ?? "없음")
+                self.loginErrorSubject.onNext("로그인 요청 실패")
             }
         }
     }
+
 }

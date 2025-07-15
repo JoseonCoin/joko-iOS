@@ -7,13 +7,13 @@ public enum SignUpAPI {
 
 extension SignUpAPI: TargetType {
     public var baseURL: URL {
-        return URL(string: "https://your-api-base-url.com")! // 실제 베이스 URL로 변경
+        return URL(string: "http://172.20.10.2:8080")!
     }
     
     public var path: String {
         switch self {
         case .signUp:
-            return "/signup" // 실제 회원가입 API 경로로 변경
+            return "/auth/signup"
         }
     }
     
@@ -37,6 +37,11 @@ extension SignUpAPI: TargetType {
     }
     
     public var headers: [String: String]? {
-        return ["Content-Type": "application/json"]
+        var headers = ["Content-Type": "application/json"]
+        if let token = UserDefaults.standard.string(forKey: "access_token") {
+            headers["Authorization"] = "Bearer \(token)"
+        }
+        return headers
     }
+
 }

@@ -28,19 +28,16 @@ class JokoTextField: UIView {
     
     let titleLabel = UILabel().then {
         $0.font = UIFont.JokoFont(.label)
-        $0.textColor = .gray600
-    }
-    
-    let backView = UIView().then {
-        $0.backgroundColor = .gray50
-        $0.layer.cornerRadius = 8.0
+        $0.textColor = .white1
     }
     
     let textField = UITextField().then {
         $0.font = UIFont.JokoFont(.placeholder)
         $0.isSecureTextEntry = false
         $0.keyboardType = .default
-        
+        $0.backgroundColor = .middleBlack
+        $0.layer.cornerRadius = 8.0
+        $0.layer.masksToBounds = true
     }
     
     let showPasswordButton = UIButton().then {
@@ -57,20 +54,31 @@ class JokoTextField: UIView {
         
         switch type {
         case .id:
-            break
-            
+            textField.addLeftView()
+            textField.addRightView()
         case .name:
-            break
+            textField.addLeftView()
+            textField.addRightView()
         case .pw:
             textField.isSecureTextEntry = true
-            textField.rightView = showPasswordButton
+            textField.addLeftView()
+            // 패스워드 필드는 showPasswordButton을 rightView로 사용
+            let containerView = UIView()
+            containerView.addSubview(showPasswordButton)
+            showPasswordButton.snp.makeConstraints {
+                $0.centerY.equalToSuperview()
+                $0.right.equalToSuperview().offset(-16)
+                $0.width.height.equalTo(24)
+            }
+            textField.rightView = containerView
             textField.rightViewMode = .always
         case .custom:
             let texts = type.text.components(separatedBy: ",")
             titleLabel.text = texts[0]
             textField.attributedPlaceholder = NSAttributedString(string: texts[1], attributes: [NSAttributedString.Key.foregroundColor : UIColor.gray200])
+            textField.addLeftView()
+            textField.addRightView()
         }
-        
         
         layout()
     }
@@ -80,8 +88,7 @@ class JokoTextField: UIView {
     }
     
     func layout() {
-        [titleLabel, backView].forEach { self.addSubview($0) }
-        backView.addSubview(textField)
+        [titleLabel, textField].forEach { self.addSubview($0) }
         
         titleLabel.snp.makeConstraints {
             $0.top.width.equalToSuperview()
@@ -89,26 +96,16 @@ class JokoTextField: UIView {
             $0.height.equalTo(19.0)
         }
         
-        backView.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(8.0)
-            $0.width.equalToSuperview()
-            $0.bottom.equalToSuperview()
-        }
-        
         textField.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview().inset(12.0)
-            $0.width.equalToSuperview().inset(12)
-            $0.centerX.equalToSuperview()
+            $0.top.equalTo(titleLabel.snp.bottom).offset(8.0)
+            $0.left.right.bottom.equalToSuperview()
+            $0.height.greaterThanOrEqualTo(44.0)
         }
     }
     
     @objc private func togglePasswordVisibility() {
-        if iconClick {
-            textField.isSecureTextEntry = false
-        } else {
-            textField.isSecureTextEntry = true
-        }
-        iconClick = !iconClick
+        textField.isSecureTextEntry.toggle()
+        iconClick.toggle()
     }
     
     public func currentText() -> String {

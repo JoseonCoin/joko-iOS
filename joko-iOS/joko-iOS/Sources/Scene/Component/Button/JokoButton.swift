@@ -16,7 +16,7 @@ public class JokoButton: UIButton {
     }
     
     private var bgColor: UIColor {
-        isEnabled ? .gray900 : .main
+        isEnabled ? .main : .gray900
     }
 
     override public init(frame: CGRect) {
@@ -56,9 +56,11 @@ public class JokoButton: UIButton {
     }
 
     private func attribute() {
-        self.backgroundColor = .gray900
-        self.setTitleColor(.gray500, for: .normal)
+        self.backgroundColor = bgColor
+        let titleColor: UIColor = isEnabled ? .middleBlack : .gray500
+        self.setTitleColor(titleColor, for: .normal)
         self.titleLabel?.font = .JokoFont(.button)
         self.layer.cornerRadius = 8
     }
+
 }

@@ -10,6 +10,9 @@ public class LoginViewController: BaseViewController<LoginViewModel> {
         $0.numberOfLines = 0
     }
 
+    private let idTextField = JokoTextField(type: .id)
+    private let pwTextField = JokoTextField(type: .pw)
+
     private let nonAccountLabel = UILabel().then {
         $0.font = UIFont.JokoFont(.body3)
         $0.text = "아직 계정이 없으신가요?"
@@ -28,6 +31,8 @@ public class LoginViewController: BaseViewController<LoginViewModel> {
     public override func addView() {
         [
             titleLabel,
+            idTextField,
+            pwTextField,
             nonAccountLabel,
             signUpButton,
             loginButton
@@ -42,6 +47,14 @@ public class LoginViewController: BaseViewController<LoginViewModel> {
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide).inset(32)
             $0.leading.equalToSuperview().inset(20)
+        }
+        idTextField.snp.makeConstraints {
+            $0.top.equalTo(titleLabel.snp.bottom).offset(40)
+            $0.leading.trailing.equalToSuperview().inset(20)
+        }
+        pwTextField.snp.makeConstraints {
+            $0.top.equalTo(idTextField.snp.bottom).offset(32)
+            $0.leading.trailing.equalToSuperview().inset(20)
         }
         nonAccountLabel.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(572)

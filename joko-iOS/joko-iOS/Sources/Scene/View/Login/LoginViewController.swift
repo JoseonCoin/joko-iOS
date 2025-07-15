@@ -45,6 +45,7 @@ public class LoginViewController: BaseViewController<LoginViewModel> {
 
     public override func attribute() {
         view.backgroundColor = .background
+        hideKeyboardWhenTappedAround()
     }
 
     public override func setLayout() {
@@ -62,25 +63,25 @@ public class LoginViewController: BaseViewController<LoginViewModel> {
             $0.top.equalTo(idTextField.snp.bottom).offset(32)
             $0.leading.trailing.equalToSuperview().inset(20)
         }
+        
+        loginButton.snp.makeConstraints {
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(26)
+            $0.leading.trailing.equalToSuperview().inset(20)
+        }
 
         nonAccountLabel.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(572)
+            $0.top.equalTo(loginButton.snp.top).inset(14)
             $0.leading.trailing.equalToSuperview().inset(112)
         }
 
         signUpButton.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(572)
+            $0.top.equalTo(pwTextField.snp.bottom).offset(249)
             $0.leading.equalTo(nonAccountLabel.snp.trailing).inset(8)
             $0.width.equalTo(42)
         }
 
-        loginButton.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(604)
-            $0.leading.trailing.equalToSuperview().inset(20)
-        }
     }
 
-    // MARK: - Binding
     public override func bind() {
         let input = LoginViewModel.Input(
             accountId: idTextField.textField.rx.text.orEmpty.asDriver(),
@@ -145,9 +146,20 @@ public class LoginViewController: BaseViewController<LoginViewModel> {
 
     private func loginSuccess() {
         showAlert(title: "로그인 성공", message: "환영합니다!") { [weak self] in
-            self?.navigationController?.dismiss(animated: true)
+            guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                  let sceneDelegate = scene.delegate as? SceneDelegate else { return }
+
+            let tabBarController = MainTabBarController2()  // BaseTabBarController 상속한 클래스
+            UIView.transition(with: sceneDelegate.window!,
+                              duration: 0.3,
+                              options: .transitionCrossDissolve,
+                              animations: {
+                                  sceneDelegate.window?.rootViewController = tabBarController
+                              },
+                              completion: nil)
         }
     }
+
 
     private func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)

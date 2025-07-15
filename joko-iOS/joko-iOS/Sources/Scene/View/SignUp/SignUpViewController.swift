@@ -25,8 +25,8 @@ public class SignUpViewController: BaseViewController<SignUpViewModel> {
     
     public override func attribute() {
         super.attribute()
-        navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         view.backgroundColor = .background
+        hideKeyboardWhenTappedAround()
     }
     
     public override func addView() {
@@ -60,8 +60,8 @@ public class SignUpViewController: BaseViewController<SignUpViewModel> {
             $0.leading.trailing.equalToSuperview().inset(20)
         }
         
-        signUpButton.snp.makeConstraints {
-            $0.top.equalTo(passwordTextField.snp.bottom).offset(281)
+         signUpButton.snp.makeConstraints {
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(26)
             $0.leading.trailing.equalToSuperview().inset(20)
         }
     }

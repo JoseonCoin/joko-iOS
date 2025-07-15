@@ -1,7 +1,10 @@
-//
-//  QuizViewController.swift
-//  joko-iOS
-//
-//  Created by 이지훈 on 7/15/25.
-//
+import UIKit
 
+
+final class QuizViewController: UIViewController {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .main
+        title = "퀴즈"
+    }
+}

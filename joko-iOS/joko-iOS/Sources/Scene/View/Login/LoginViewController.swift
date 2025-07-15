@@ -1,6 +1,8 @@
 import UIKit
 import SnapKit
 import Then
+import RxSwift
+import RxCocoa
 
 public class LoginViewController: BaseViewController<LoginViewModel> {
     private let titleLabel = UILabel().then {
@@ -48,27 +50,115 @@ public class LoginViewController: BaseViewController<LoginViewModel> {
             $0.top.equalTo(view.safeAreaLayoutGuide).inset(32)
             $0.leading.equalToSuperview().inset(20)
         }
+
         idTextField.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(40)
             $0.leading.trailing.equalToSuperview().inset(20)
         }
+
         pwTextField.snp.makeConstraints {
             $0.top.equalTo(idTextField.snp.bottom).offset(32)
             $0.leading.trailing.equalToSuperview().inset(20)
         }
+
         nonAccountLabel.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(572)
             $0.leading.trailing.equalToSuperview().inset(112)
         }
+
         signUpButton.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(572)
             $0.leading.equalTo(nonAccountLabel.snp.trailing).inset(8)
             $0.width.equalTo(42)
         }
+
         loginButton.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(604)
             $0.leading.trailing.equalToSuperview().inset(20)
         }
     }
 
+    // MARK: - Binding
+    public override func bind() {
+        let input = LoginViewModel.Input(
+            accountId: idTextField.textField.rx.text.orEmpty.asDriver(),
+            password: pwTextField.textField.rx.text.orEmpty.asDriver(),
+            loginTap: loginButton.rx.tap.asDriver(),
+            signUpTap: signUpButton.rx.tap.asDriver()
+        )
+
+        let output = viewModel.transform(input: input)
+
+        // 로그인 버튼 활성화
+        output.isLoginEnabled
+            .drive(onNext: { [weak self] (isEnabled: Bool) in
+                self?.loginButton.isEnabled = isEnabled
+                self?.loginButton.alpha = isEnabled ? 1.0 : 0.5
+            })
+            .disposed(by: disposeBag)
+
+        // 로딩 처리
+        output.isLoading
+            .drive(onNext: { [weak self] (isLoading: Bool) in
+                if isLoading {
+                    self?.showLoading()
+                } else {
+                    self?.hideLoading()
+                }
+            })
+            .disposed(by: disposeBag)
+
+        // 로그인 성공
+        output.loginSuccess
+            .drive(onNext: { [weak self] in
+                self?.loginSuccess()
+            })
+            .disposed(by: disposeBag)
+
+        // 로그인 실패
+        output.loginError
+            .drive(onNext: { [weak self] errorMessage in
+                self?.showAlert(title: "로그인 실패", message: errorMessage)
+            })
+            .disposed(by: disposeBag)
+
+        // 회원가입
+        output.signUpTap
+            .drive(onNext: { [weak self] in
+                self?.navigateToSignUp()
+            })
+            .disposed(by: disposeBag)
+    }
+
+    private func showLoading() {
+        loginButton.isEnabled = false
+        loginButton.setTitle("로그인 중...", for: .normal)
+        view.isUserInteractionEnabled = false
+    }
+
+    private func hideLoading() {
+        loginButton.setTitle("로그인하기", for: .normal)
+        view.isUserInteractionEnabled = true
+    }
+
+    private func loginSuccess() {
+        showAlert(title: "로그인 성공", message: "환영합니다!") { [weak self] in
+            self?.navigationController?.dismiss(animated: true)
+        }
+    }
+
+    private func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "확인", style: .default) { _ in
+            completion?()
+        })
+        present(alert, animated: true)
+    }
+
+    private func navigateToSignUp() {
+        print("회원가입 버튼 클릭")
+        // 예시 코드
+        // let signUpVC = SignUpViewController()
+        // navigationController?.pushViewController(signUpVC, animated: true)
+    }
 }

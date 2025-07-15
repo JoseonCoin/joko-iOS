@@ -27,7 +27,8 @@ class JokoTextField: UIView {
     var iconClick = true
     
     let titleLabel = UILabel().then {
-        $0.font = UIFont.JokoFont(.body2)
+        $0.font = UIFont.JokoFont(.label)
+        $0.textColor = .gray600
     }
     
     let backView = UIView().then {
@@ -57,6 +58,7 @@ class JokoTextField: UIView {
         switch type {
         case .id:
             break
+            
         case .name:
             break
         case .pw:

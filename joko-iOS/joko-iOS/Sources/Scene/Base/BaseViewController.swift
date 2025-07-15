@@ -9,7 +9,6 @@ open class BaseViewController<ViewModel: BaseViewModel>: UIViewController, UIGes
 
     public var viewWillAppearRelay = PublishRelay<Void>()
     
-    
     public init(viewModel: ViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -27,12 +26,10 @@ open class BaseViewController<ViewModel: BaseViewModel>: UIViewController, UIGes
         addView()
         setLayout()
     }
-
     open func attribute() {
         view.backgroundColor = .systemBackground
         navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
-
     open func bindAction() {
         // Rx 액션을 설정하는 함수
     }

@@ -1,8 +1,10 @@
 import UIKit
 import SnapKit
 import Then
+import Moya
 
 public class SignUpViewController: BaseViewController<SignUpViewModel> {
+    let provider = MoyaProvider<LoginAPI>(plugins: [MoyaLoggingPlugin()])
     private let titleLabel = UILabel().then {
         $0.font = UIFont.JokoFont(.title2)
         $0.text = "회원가입하고\n조코 사용하기"

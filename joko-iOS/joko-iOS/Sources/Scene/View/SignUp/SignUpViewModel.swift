@@ -1,17 +1,78 @@
-import UIKit
+import Foundation
+import RxSwift
+import RxCocoa
+import Moya
 
 public class SignUpViewModel: BaseViewModel {
     
     public struct Input {
-        // 필요한 Input 프로퍼티들을 여기에 추가
+        let username: Driver<String>
+        let accountId: Driver<String>
+        let password: Driver<String>
+        let signUpTap: Driver<Void>
     }
     
     public struct Output {
-        // 필요한 Output 프로퍼티들을 여기에 추가
+        let isSignUpEnabled: Driver<Bool>
+        let isLoading: Driver<Bool>
+        let signUpSuccess: Driver<Void>
+        let signUpError: Driver<String>
     }
     
+    private let isLoadingSubject = BehaviorSubject<Bool>(value: false)
+    private let signUpSuccessSubject = PublishSubject<Void>()
+    private let signUpErrorSubject = PublishSubject<String>()
+    private let disposeBag = DisposeBag()
+    private let provider = MoyaProvider<SignUpAPI>(plugins: [MoyaLoggingPlugin()])
+    
     public func transform(input: Input) -> Output {
-        // 실제 로직 구현
-        return Output()
+        let isSignUpEnabled = Driver.combineLatest(
+            input.username,
+            input.accountId,
+            input.password
+        ) { username, accountId, password in
+            return !username.isEmpty && !accountId.isEmpty && password.count >= 8
+        }
+
+        input.signUpTap
+            .withLatestFrom(Driver.combineLatest(input.username, input.accountId, input.password))
+            .drive(onNext: { [weak self] username, accountId, password in
+                self?.signUp(username: username, accountId: accountId, password: password)
+            })
+            .disposed(by: disposeBag)
+        
+        return Output(
+            isSignUpEnabled: isSignUpEnabled,
+            isLoading: isLoadingSubject.asDriver(onErrorJustReturn: false),
+            signUpSuccess: signUpSuccessSubject.asDriver(onErrorJustReturn: ()),
+            signUpError: signUpErrorSubject.asDriver(onErrorJustReturn: "알 수 없는 오류 발생")
+        )
+    }
+    
+    private func signUp(username: String, accountId: String, password: String) {
+        isLoadingSubject.onNext(true)
+        
+        provider.request(.signUp(username: username, accountId: accountId, password: password)) { [weak self] result in
+            self?.isLoadingSubject.onNext(false)
+            
+            switch result {
+            case .success(let response):
+                switch response.statusCode {
+                case 201:
+                    // 회원가입 성공
+                    self?.signUpSuccessSubject.onNext(())
+                case 400:
+                    // 잘못된 요청
+                    self?.signUpErrorSubject.onNext("요청 데이터가 잘못되었습니다.")
+                case 500:
+                    // 서버 오류
+                    self?.signUpErrorSubject.onNext("서버 오류가 발생했습니다.")
+                default:
+                    self?.signUpErrorSubject.onNext("회원가입에 실패했습니다.")
+                }
+            case .failure(let error):
+                self?.signUpErrorSubject.onNext("네트워크 오류: \(error.localizedDescription)")
+            }
+        }
     }
 }

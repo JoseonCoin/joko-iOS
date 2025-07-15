@@ -34,6 +34,7 @@ final class HomeViewController: BaseViewController<HomeViewModel> {
         view.backgroundColor = .background
         navigationBar.backgroundColor = .clear
         hideKeyboardWhenTappedAround()
+        navigationBar.parentViewController = self
     }
     
     public override func setLayout() {

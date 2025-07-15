@@ -5,23 +5,9 @@ import Then
 public class JokoMainNavigationBar: UIView {
     weak var parentViewController: UIViewController?
     
-    private let sinceBackView = UIView().then {
-        $0.backgroundColor = .red
-    }
-    
-    private let sinceButton = UIButton().then {
-        $0.setTitle("조선 전기", for: .normal)
-        $0.setTitleColor(.black, for: .normal)
-        $0.titleLabel?.font = .chosunFont(size: 20)
-    }
-    
     private let sinceUnderButton = UIButton().then {
-        $0.setImage(UIImage(named: "underbutton"), for: .normal)
-    }
-    
-    private let sideBackView = UIView().then {
-        $0.backgroundColor = .gray400
-        $0.layer.cornerRadius = 12
+        let image = UIImage(named: "underbutton")?.withRenderingMode(.alwaysOriginal)
+        $0.setImage(image, for: .normal)
     }
     
     private let shopButton = UIImageView().then {
@@ -44,66 +30,47 @@ public class JokoMainNavigationBar: UIView {
     }
     
     private func layout() {
-        addSubview(sinceBackView)
-        sinceBackView.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(9.5)
-            $0.bottom.equalToSuperview().inset(9.5)
-            $0.leading.equalToSuperview().inset(20)
-        }
-        
-        sinceBackView.addSubview(sinceButton)
-        sinceButton.snp.makeConstraints {
-            $0.top.bottom.leading.equalToSuperview()
-        }
-        
-        sinceBackView.addSubview(sinceUnderButton)
+        addSubview(sinceUnderButton)
         sinceUnderButton.snp.makeConstraints {
-            $0.leading.equalTo(sinceButton.snp.trailing).offset(4)
-            $0.centerY.equalToSuperview()
-            $0.trailing.equalToSuperview()
-            $0.width.height.equalTo(24)
+            $0.top.equalTo(self.safeAreaLayoutGuide).offset(9.5)
+            $0.leading.equalToSuperview().inset(20)
+            $0.width.equalTo(100)
+            $0.height.equalTo(25)
         }
         
-        addSubview(sideBackView)
-        sideBackView.snp.makeConstraints {
+        addSubview(shopButton)
+        shopButton.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(4)
             $0.trailing.equalToSuperview().inset(20)
-            $0.centerY.equalToSuperview()
             $0.width.equalTo(44)
             $0.height.equalTo(36)
-        }
-        
-        sideBackView.addSubview(shopButton)
-        shopButton.snp.makeConstraints {
-            $0.center.equalToSuperview()
-            $0.width.equalTo(20)
-            $0.height.equalTo(17.92)
         }
     }
     
     private func setupGesture() {
-        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(sinceBackViewPressed(_:)))
+        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(sinceUnderButtonPressed(_:)))
         longPressGesture.minimumPressDuration = 0.0
-        sinceBackView.addGestureRecognizer(longPressGesture)
-        sinceBackView.isUserInteractionEnabled = true
+        sinceUnderButton.addGestureRecognizer(longPressGesture)
+        sinceUnderButton.isUserInteractionEnabled = true
 
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(shopButtonTapped))
         shopButton.addGestureRecognizer(tapGesture)
     }
     
-    @objc private func sinceBackViewPressed(_ gesture: UILongPressGestureRecognizer) {
+    @objc private func sinceUnderButtonPressed(_ gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
             UIView.animate(withDuration: 0.1) {
-                self.sinceBackView.alpha = 0.7
+                self.sinceUnderButton.alpha = 0.7
             }
         case .ended:
             UIView.animate(withDuration: 0.1) {
-                self.sinceBackView.alpha = 1.0
+                self.sinceUnderButton.alpha = 1.0
             }
             presentChangeEraViewController()
         case .cancelled:
             UIView.animate(withDuration: 0.1) {
-                self.sinceBackView.alpha = 1.0
+                self.sinceUnderButton.alpha = 1.0
             }
         default:
             break

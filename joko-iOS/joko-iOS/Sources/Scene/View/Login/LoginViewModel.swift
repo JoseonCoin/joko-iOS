@@ -4,7 +4,10 @@ import RxCocoa
 import Moya
 import Alamofire
 
+// MARK: - LoginViewModel
+
 public class LoginViewModel: BaseViewModel {
+    
     public struct Input {
         let accountId: Driver<String>
         let password: Driver<String>
@@ -66,18 +69,16 @@ public class LoginViewModel: BaseViewModel {
     private func login(accountId: String, password: String) {
         print("🟡 로그인 시작 - ID: \(accountId)")
         isLoadingSubject.onNext(true)
-
-        // 네트워크 요청 직전 로그
         print("🟡 네트워크 요청 시작")
-        
+
         provider.request(.login(accountId: accountId, password: password)) { [weak self] result in
             print("🟢 네트워크 응답 받음")
-            
+
             guard let self = self else {
                 print("🔴 self가 nil")
                 return
             }
-            
+
             self.isLoadingSubject.onNext(false)
 
             switch result {
@@ -90,21 +91,16 @@ public class LoginViewModel: BaseViewModel {
                         let decoded = try JSONDecoder().decode(LoginResponse.self, from: response.data)
                         print("🟢 디코딩 성공")
 
-                        // ✅ accessToken 저장
-                        UserDefaults.standard.set(decoded.accessToken, forKey: "access_token")
-                        UserDefaults.standard.set(decoded.refreshToken, forKey: "refresh_token")
+                        TokenManager.shared.saveTokens(
+                            accessToken: decoded.accessToken,
+                            refreshToken: decoded.refreshToken
+                        )
 
-                        // ✅ userId 디코딩 및 저장
-                        if let payload = decodeJWT(decoded.accessToken),
-                           let userId = payload["userId"] as? Int {
-                            print("✅ 디코딩된 userId: \(userId)")
-                            UserDefaults.standard.set(userId, forKey: "user_id")
-                        } else {
-                            print("❌ userId 디코딩 실패")
-                        }
-
-                        // ✅ 성공 이벤트 전달
                         self.loginSuccessSubject.onNext(())
+
+                        // ✅ 테스트용 API 호출
+                        self.testFetchQuizIds()
+
                     } catch {
                         print("🔴 디코딩 오류: \(error)")
                         self.loginErrorSubject.onNext("응답 파싱 실패")
@@ -116,14 +112,13 @@ public class LoginViewModel: BaseViewModel {
                 print("🔴 에러: \(error)")
                 print("🔴 상태 코드: \(error.response?.statusCode ?? -1)")
                 print("🔴 에러 응답: \(String(data: error.response?.data ?? Data(), encoding: .utf8) ?? "없음")")
-                
-                // 구체적인 에러 메시지 처리
+
                 let errorMessage = self.getErrorMessage(from: error)
                 self.loginErrorSubject.onNext(errorMessage)
             }
         }
     }
-    
+
     private func getErrorMessage(from error: MoyaError) -> String {
         switch error {
         case .underlying(let nsError, _):
@@ -162,6 +157,21 @@ public class LoginViewModel: BaseViewModel {
             return "이미지 변환 오류"
         }
     }
+
+    // MARK: - 테스트: 퀴즈 ID API 호출
+
+    private func testFetchQuizIds() {
+        let quizProvider = MoyaProvider<QuizIdAPI>()
+        quizProvider.request(.fetchQuizIds) { result in
+            switch result {
+            case .success(let response):
+                print("✅ [Test] Quiz ID API 응답 상태 코드: \(response.statusCode)")
+                print("✅ [Test] 응답 본문: \(String(data: response.data, encoding: .utf8) ?? "없음")")
+            case .failure(let error):
+                print("❌ [Test] Quiz ID API 호출 실패: \(error.localizedDescription)")
+            }
+        }
+    }
 }
 
 struct LoginResponse: Decodable {
@@ -170,3 +180,5 @@ struct LoginResponse: Decodable {
     let refreshToken: String
     let refreshTokenExpiresAt: String
 }
+
+// M

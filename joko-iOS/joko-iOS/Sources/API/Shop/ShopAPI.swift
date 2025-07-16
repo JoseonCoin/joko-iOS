@@ -23,8 +23,9 @@ enum ShopAPI {
 
 extension ShopAPI: TargetType {
     var baseURL: URL {
-        return URL(string: "http://13.50.13.148:8080")!
+        return URL(string: "http://172.20.10.2::8000")!
     }
+
     
     var path: String {
         switch self {
@@ -124,7 +125,7 @@ class ShopService {
                 return Single.error(ShopAPIError.networkError)
             }
     }
-    
+
     // JWT 토큰 만료 체크
     private func isTokenExpired(_ token: String) -> Bool {
         let parts = token.components(separatedBy: ".")

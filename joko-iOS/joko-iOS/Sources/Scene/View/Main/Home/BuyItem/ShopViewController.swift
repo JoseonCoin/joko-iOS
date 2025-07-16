@@ -56,19 +56,16 @@ final class ShopViewController: BaseViewController<ShopViewModel> {
         viewDidLoadSubject.onNext(())
     }
 
-    // ✅ 첫 진입이 아닐 때만 API 갱신, 중복 요청 방지
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        // 첫 로드가 아니고, 최소 간격이 지났을 때만 갱신
+
         if !isFirstLoad && shouldMakeRequest() {
             print("🟡 [ShopViewController] Refreshing data on viewWillAppear")
             refreshSubject.onNext(())
         }
         isFirstLoad = false
     }
-    
-    // 중복 요청 방지를 위한 시간 체크
+
     private func shouldMakeRequest() -> Bool {
         guard let lastTime = lastRequestTime else {
             lastRequestTime = Date()

@@ -4,19 +4,33 @@ import RxCocoa
 import Moya
 
 public class QuizViewModel: BaseViewModel {
+    private let disposeBag = DisposeBag()
+    private let provider = MoyaProvider<QuizIdAPI>(
+        plugins: [MoyaLoggingPlugin(), AuthPlugin()]
+    )
+    
     public struct Input {
-        // 나중에 필요한 Input 정의
+        let fetchTrigger: Observable<Void>
     }
-    
+
     public struct Output {
-        // 나중에 필요한 Output 정의
-        public init() {} // 빈 이니셜라이저 추가
+        let quizIds: Driver<[Int]>
     }
-    
-    public init() {} // 필요 시 생성자 추가
-    
+
     public func transform(input: Input) -> Output {
-        return Output() // 빈 Output 반환
+        let quizIds = input.fetchTrigger
+            .flatMapLatest { [weak self] _ -> Observable<[Int]> in
+                guard let self = self else { return .just([]) }
+                return self.provider.rx.request(.fetchQuizIds)
+                    .filterSuccessfulStatusCodes()
+                    .map([Int].self)
+                    .asObservable()
+                    .catchAndReturn([]) // 실패 시 빈 배열 처리
+            }
+            .asDriver(onErrorJustReturn: [])
+
+        return Output(quizIds: quizIds)
     }
 }
+
 

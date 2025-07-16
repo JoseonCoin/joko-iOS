@@ -16,14 +16,14 @@ struct ShopItem: Codable {
     }
 }
 
-// MARK: - Shop API Target
+// MARK: - Shop API
 enum ShopAPI {
     case getAllItems
 }
 
 extension ShopAPI: TargetType {
     var baseURL: URL {
-        return URL(string: "http://172.20.10.2:8080")!
+        return URL(string: "http://13.50.13.148:8080")!
     }
     
     var path: String {
@@ -48,30 +48,22 @@ extension ShopAPI: TargetType {
         ]
         
         if let token = UserDefaults.standard.string(forKey: "access_token") {
-            print("🟡 [ShopAPI] Using access token: \(token.prefix(20))...")
             headers["Authorization"] = "Bearer \(token)"
-        } else {
-            print("🔴 [ShopAPI] No access token found!")
         }
         
-        print("🟡 [ShopAPI] Request headers: \(headers)")
         return headers
     }
 }
 
-// MARK: - Shop Service
+// MARK: - Shop Service with Unified Logging
 class ShopService {
     static let shared = ShopService()
     
     private let provider = MoyaProvider<ShopAPI>(plugins: [
-        NetworkLoggerPlugin(configuration: .init(
-            formatter: .init(responseData: JSONResponseDataFormatter),
-            logOptions: .verbose
-        )),
+        MoyaLoggingPlugin(), // 로그인 API와 같은 로깅 플러그인 사용
         AuthPlugin()
     ])
     
-    // 요청 관리를 위한 DisposeBag
     private var requestDisposeBag = DisposeBag()
     
     private init() {}
@@ -79,67 +71,90 @@ class ShopService {
     func fetchAllItems() -> Single<[ShopItem]> {
         print("🟡 [ShopService] Starting API request to /all")
         
-        if let token = UserDefaults.standard.string(forKey: "access_token") {
-            print("🟢 [ShopService] Token exists: \(token.prefix(20))...")
-        } else {
-            print("🔴 [ShopService] No token found - API will likely fail")
+        // 토큰 존재 확인
+        guard let token = UserDefaults.standard.string(forKey: "access_token") else {
+            print("🔴 [ShopService] No token found")
+            return Single.error(ShopAPIError.authenticationFailed)
         }
         
+        // JWT 토큰 만료 체크
+        if isTokenExpired(token) {
+            print("🔴 [ShopService] Token is expired")
+            clearInvalidToken()
+            return Single.error(ShopAPIError.tokenExpired)
+        }
+        
+        print("🟢 [ShopService] Token exists and valid: \(token.prefix(20))...")
+        
         return provider.rx.request(ShopAPI.getAllItems)
-            .timeout(.seconds(30), scheduler: MainScheduler.instance) // 30초 타임아웃 설정
+            .timeout(.seconds(30), scheduler: MainScheduler.instance)
             .do(onSuccess: { response in
-                print("🟢 [ShopService] API Response received")
-                print("🟢 Status code: \(response.statusCode)")
-                print("🟢 Response headers: \(response.response?.allHeaderFields ?? [:])")
-                
-                if let jsonString = String(data: response.data, encoding: .utf8) {
-                    print("🟢 Response JSON:\n\(jsonString)")
-                }
+                print("🟢 [ShopService] API Response received - Status: \(response.statusCode)")
             })
             .flatMap { response -> Single<[ShopItem]> in
                 switch response.statusCode {
                 case 200...299:
                     return self.parseShopItems(from: response.data)
-                case 401, 403:
-                    print("🔴 [ShopService] Authentication failed - Status: \(response.statusCode)")
+                case 401:
+                    print("🔴 [ShopService] 401 Unauthorized")
+                    self.clearInvalidToken()
+                    return Single.error(ShopAPIError.authenticationFailed)
+                case 403:
+                    print("🔴 [ShopService] 403 Forbidden")
+                    self.clearInvalidToken()
                     return Single.error(ShopAPIError.authenticationFailed)
                 case 404:
-                    print("🔴 [ShopService] Endpoint not found - Status: \(response.statusCode)")
+                    print("🔴 [ShopService] 404 Not Found")
                     return Single.error(ShopAPIError.endpointNotFound)
                 case 500...599:
-                    print("🔴 [ShopService] Server error - Status: \(response.statusCode)")
+                    print("🔴 [ShopService] Server error: \(response.statusCode)")
                     return Single.error(ShopAPIError.serverError)
                 default:
-                    print("🔴 [ShopService] Unexpected status code: \(response.statusCode)")
+                    print("🔴 [ShopService] Unexpected status: \(response.statusCode)")
                     return Single.error(ShopAPIError.unexpectedError)
                 }
             }
             .do(onError: { error in
                 print("🔴 [ShopService] Final error: \(error)")
-                
-                // MoyaError 처리
-                if let moyaError = error as? MoyaError {
-                    switch moyaError {
-                    case .underlying(let underlyingError, _):
-                        print("🔴 [ShopService] Underlying error: \(underlyingError)")
-                        if underlyingError.localizedDescription.contains("cancelled") {
-                            print("🟡 [ShopService] Request was cancelled - this is expected behavior")
-                        }
-                    default:
-                        print("🔴 [ShopService] Moya error: \(moyaError)")
-                    }
-                }
             })
             .catch { error in
-                // 취소 에러인 경우 빈 배열 대신 에러 전파
-                if error.localizedDescription.contains("cancelled") ||
-                   error.localizedDescription.contains("explicitlyCancelled") {
+                if error.localizedDescription.contains("cancelled") {
                     return Single.error(error)
                 }
-                
-                // 다른 에러의 경우 적절한 에러 타입으로 변환
                 return Single.error(ShopAPIError.networkError)
             }
+    }
+    
+    // JWT 토큰 만료 체크
+    private func isTokenExpired(_ token: String) -> Bool {
+        let parts = token.components(separatedBy: ".")
+        guard parts.count == 3 else {
+            print("🔴 [ShopService] Invalid JWT format")
+            return true
+        }
+        
+        let payloadPart = parts[1]
+        let paddedPayload = payloadPart.padding(toLength: ((payloadPart.count + 3) / 4) * 4, withPad: "=", startingAt: 0)
+        
+        guard let payloadData = Data(base64Encoded: paddedPayload),
+              let payload = try? JSONSerialization.jsonObject(with: payloadData) as? [String: Any],
+              let exp = payload["exp"] as? TimeInterval else {
+            print("🔴 [ShopService] Cannot parse token expiration")
+            return true
+        }
+        
+        let currentTime = Date().timeIntervalSince1970
+        let isExpired = currentTime >= exp
+        
+        print("🟡 [ShopService] Token expiry check - Current: \(currentTime), Expires: \(exp), Expired: \(isExpired)")
+        
+        return isExpired
+    }
+    
+    // 무효한 토큰 제거
+    private func clearInvalidToken() {
+        UserDefaults.standard.removeObject(forKey: "access_token")
+        print("🟡 [ShopService] Invalid token cleared")
     }
     
     private func parseShopItems(from data: Data) -> Single<[ShopItem]> {
@@ -158,12 +173,6 @@ class ShopService {
         }
     }
     
-    // 토큰 갱신 함수
-    func refreshTokenIfNeeded() -> Single<Bool> {
-        return Single.just(true)
-    }
-    
-    // 진행 중인 요청 취소
     func cancelOngoingRequests() {
         requestDisposeBag = DisposeBag()
         print("🟡 [ShopService] All ongoing requests cancelled")
@@ -203,7 +212,6 @@ enum ShopAPIError: Error, LocalizedError {
     }
 }
 
-// MARK: - Custom Auth Plugin
 class AuthPlugin: PluginType {
     func prepare(_ request: URLRequest, target: TargetType) -> URLRequest {
         var request = request
@@ -221,33 +229,56 @@ class AuthPlugin: PluginType {
     func didReceive(_ result: Result<Response, MoyaError>, target: TargetType) {
         switch result {
         case let .success(response):
-            if response.statusCode == 403 {
-                print("🔴 [AuthPlugin] 403 Forbidden - Token may be invalid")
+            switch response.statusCode {
+            case 401:
+                print("🔴 [AuthPlugin] 401 Unauthorized - Token invalid")
                 handleAuthenticationFailure()
+            case 403:
+                print("🔴 [AuthPlugin] 403 Forbidden - Access denied")
+                handleAuthenticationFailure()
+            default:
+                break
             }
         case let .failure(error):
-            print("🔴 [AuthPlugin] Request failed: \(error)")
-            
-            // 취소 에러가 아닌 경우에만 로그
             if !error.localizedDescription.contains("cancelled") {
-                print("🔴 [AuthPlugin] Non-cancellation error: \(error)")
+                print("🔴 [AuthPlugin] Request failed: \(error)")
             }
         }
     }
     
     private func handleAuthenticationFailure() {
         print("🔴 [AuthPlugin] Handling authentication failure")
-        // 토큰 제거 또는 갱신 로직
+        UserDefaults.standard.removeObject(forKey: "access_token")
+        NotificationCenter.default.post(name: NSNotification.Name("AuthenticationFailed"), object: nil)
     }
 }
 
-// MARK: - JSON Response Formatter
-private func JSONResponseDataFormatter(_ data: Data) -> String {
-    do {
-        let dataAsJSON = try JSONSerialization.jsonObject(with: data)
-        let prettyData = try JSONSerialization.data(withJSONObject: dataAsJSON, options: .prettyPrinted)
-        return String(data: prettyData, encoding: .utf8) ?? String(data: data, encoding: .utf8) ?? ""
-    } catch {
-        return String(data: data, encoding: .utf8) ?? ""
+// MARK: - Debug Helper
+extension ShopService {
+    func debugTokenInfo() {
+        guard let token = UserDefaults.standard.string(forKey: "access_token") else {
+            print("🔴 [Debug] No token found")
+            return
+        }
+        
+        print("🟡 [Debug] Full token: \(token)")
+        
+        let parts = token.components(separatedBy: ".")
+        if parts.count == 3 {
+            let payloadPart = parts[1]
+            let paddedPayload = payloadPart.padding(toLength: ((payloadPart.count + 3) / 4) * 4, withPad: "=", startingAt: 0)
+            
+            if let payloadData = Data(base64Encoded: paddedPayload),
+               let payload = try? JSONSerialization.jsonObject(with: payloadData) as? [String: Any] {
+                print("🟡 [Debug] Token payload: \(payload)")
+                
+                if let exp = payload["exp"] as? TimeInterval {
+                    let expDate = Date(timeIntervalSince1970: exp)
+                    print("🟡 [Debug] Token expires at: \(expDate)")
+                    print("🟡 [Debug] Current time: \(Date())")
+                    print("🟡 [Debug] Is expired: \(Date() >= expDate)")
+                }
+            }
+        }
     }
 }

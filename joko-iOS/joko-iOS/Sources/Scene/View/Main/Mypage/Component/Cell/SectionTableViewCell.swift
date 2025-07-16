@@ -1,13 +1,4 @@
-//
-//  SectionTableViewCell.swift
-//  joko-iOS
-//
-//  Created by 이지훈 on 7/16/25.
-//
-
-
 import UIKit
-import DesignSystem
 
 typealias SectionType = (String, UIImage)
 final class SectionTableViewCell: BaseTableViewCell<SectionType> {
@@ -17,7 +8,7 @@ final class SectionTableViewCell: BaseTableViewCell<SectionType> {
 
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         super.setHighlighted(highlighted, animated: animated)
-        self.titleLabel.textColor = self.isHighlighted ? .GrayScale.gray50 : .GrayScale.gray90
+        self.titleLabel.textColor = self.isHighlighted ? .gray100 : .gray200
     }
 
     override func addView() {
@@ -41,7 +32,7 @@ final class SectionTableViewCell: BaseTableViewCell<SectionType> {
 
     override func adapt(model: SectionType) {
         self.sectionImageView.image = model.1
-        self.titleLabel.setJobisText(model.0, font: .body, color: .GrayScale.gray90)
+//        self.titleLabel.setJobisText(model.0, font: .body, color: .GrayScale.gray90)
         self.selectionStyle = .none
     }
 }

@@ -6,18 +6,12 @@ import RxCocoa
 
 final class AccountSectionView: BaseView {
     enum AccountSectionType: Int {
-        case interestField = 0
-        case changePassword = 1
         case logout = 2
-        case withDraw = 3
     }
     private let accountSectionView = SectionView(
         menuText: "계정",
         items: [
-            ("관심분야 선택"),
-            ("비밀번호 변경",),
-            ("로그아웃"),
-            ("회원 탈퇴")
+            ("로그아웃", .selectHome)
         ]
     )
 

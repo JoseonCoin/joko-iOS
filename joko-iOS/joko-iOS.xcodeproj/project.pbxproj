@@ -14,6 +14,8 @@
 		6F4ACF6F2E250F7800816139 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 6F4ACF6E2E250F7800816139 /* RxRelay */; };
 		6F4ACF742E25111B00816139 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 6F4ACF732E25111B00816139 /* Moya */; };
 		6F4ACF762E25111B00816139 /* RxMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 6F4ACF752E25111B00816139 /* RxMoya */; };
+		6F8D35492E275D1D009B6B4C /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 6F8D35482E275D1D009B6B4C /* KeychainSwift */; };
+		6F8D354C2E275EF4009B6B4C /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = 6F8D354B2E275EF4009B6B4C /* Swinject */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,7 +53,9 @@
 				6F4ACF742E25111B00816139 /* Moya in Frameworks */,
 				6F4ACF6B2E250F7800816139 /* RxBlocking in Frameworks */,
 				6F4ACF762E25111B00816139 /* RxMoya in Frameworks */,
+				6F8D354C2E275EF4009B6B4C /* Swinject in Frameworks */,
 				6F4ACF6D2E250F7800816139 /* RxCocoa in Frameworks */,
+				6F8D35492E275D1D009B6B4C /* KeychainSwift in Frameworks */,
 				6F4ACF592E250ACA00816139 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -102,6 +106,8 @@
 				6F4ACF6E2E250F7800816139 /* RxRelay */,
 				6F4ACF732E25111B00816139 /* Moya */,
 				6F4ACF752E25111B00816139 /* RxMoya */,
+				6F8D35482E275D1D009B6B4C /* KeychainSwift */,
+				6F8D354B2E275EF4009B6B4C /* Swinject */,
 			);
 			productName = "joko-iOS";
 			productReference = 6F4ACF392E25094600816139 /* joko-iOS.app */;
@@ -136,6 +142,8 @@
 				6F4ACF572E250ACA00816139 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				6F4ACF692E250F7800816139 /* XCRemoteSwiftPackageReference "RxSwift" */,
 				6F4ACF722E25111B00816139 /* XCRemoteSwiftPackageReference "Moya" */,
+				6F8D35472E275D1D009B6B4C /* XCRemoteSwiftPackageReference "keychain-swift" */,
+				6F8D354A2E275EF4009B6B4C /* XCRemoteSwiftPackageReference "Swinject" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6F4ACF3A2E25094600816139 /* Products */;
@@ -399,6 +407,22 @@
 				minimumVersion = 15.0.3;
 			};
 		};
+		6F8D35472E275D1D009B6B4C /* XCRemoteSwiftPackageReference "keychain-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/evgenyneu/keychain-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 24.0.0;
+			};
+		};
+		6F8D354A2E275EF4009B6B4C /* XCRemoteSwiftPackageReference "Swinject" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Swinject/Swinject.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.9.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -436,6 +460,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6F4ACF722E25111B00816139 /* XCRemoteSwiftPackageReference "Moya" */;
 			productName = RxMoya;
+		};
+		6F8D35482E275D1D009B6B4C /* KeychainSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6F8D35472E275D1D009B6B4C /* XCRemoteSwiftPackageReference "keychain-swift" */;
+			productName = KeychainSwift;
+		};
+		6F8D354B2E275EF4009B6B4C /* Swinject */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6F8D354A2E275EF4009B6B4C /* XCRemoteSwiftPackageReference "Swinject" */;
+			productName = Swinject;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

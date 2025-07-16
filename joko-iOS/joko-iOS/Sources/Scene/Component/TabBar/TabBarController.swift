@@ -7,7 +7,7 @@ public class TabBarController: BaseTabBarController {
         let homeVC = UINavigationController(rootViewController: HomeViewController(viewModel: HomeViewModel()))
         homeVC.tabBarItem = JokoTabBarTypeItem(.home)
         
-        let quizVC = UINavigationController(rootViewController: QuizViewController())
+        let quizVC = UINavigationController(rootViewController: QuizViewController(viewModel: QuizViewModel()))
         quizVC.tabBarItem = JokoTabBarTypeItem(.quiz)
         
         let myPageVC = UINavigationController(rootViewController: MyPageViewController())

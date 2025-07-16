@@ -4,12 +4,18 @@ import Then
 
 final class HomeViewController: BaseViewController<HomeViewModel> {
     private let navigationBar = JokoMainNavigationBar()
-    private let nobiBackGround = UIImageView().then {
+    private let backGround = UIImageView().then {
         $0.image = UIImage(named: "satto")?.withRenderingMode(.alwaysOriginal)
     }
+    private let itemLabel = UILabel().then {
+        $0.font = UIFont.chosunFont(size: 16)
+        $0.text = "천민이 획득한 아이템"
+    }
+
     public override func addView() {
         [
-            nobiBackGround,
+            backGround,
+            itemLabel,
             navigationBar
         ].forEach { view.addSubview($0) }
     }
@@ -22,7 +28,7 @@ final class HomeViewController: BaseViewController<HomeViewModel> {
     }
     
     public override func setLayout() {
-        nobiBackGround.snp.makeConstraints {
+        backGround.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
 
@@ -31,5 +37,11 @@ final class HomeViewController: BaseViewController<HomeViewModel> {
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(60)
         }
+
+        itemLabel.snp.makeConstraints {
+            $0.top.equalTo(navigationBar.snp.bottom).offset(504)
+            $0.leading.equalToSuperview().inset(25)
+        }
+      
     }
 }

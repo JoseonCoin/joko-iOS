@@ -7,7 +7,7 @@ enum LoginAPI {
 
 extension LoginAPI: TargetType {
     var baseURL: URL {
-        return URL(string: "http://172.20.10.2:8000")!
+        return URL(string: "http://172.20.10.2:8080")!
     }
 
     var path: String {

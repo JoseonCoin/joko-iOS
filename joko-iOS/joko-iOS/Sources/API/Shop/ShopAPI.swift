@@ -23,14 +23,14 @@ enum ShopAPI {
 
 extension ShopAPI: TargetType {
     var baseURL: URL {
-        return URL(string: "http://172.20.10.2::8000")!
+        return URL(string: "http://172.20.10.2:8080")!
     }
 
     
     var path: String {
         switch self {
         case .getAllItems:
-            return "/all"
+            return "/item/all"
         }
     }
     

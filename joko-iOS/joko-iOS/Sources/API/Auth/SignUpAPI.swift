@@ -7,7 +7,7 @@ public enum SignUpAPI {
 
 extension SignUpAPI: TargetType {
     public var baseURL: URL {
-        return URL(string: "http://172.20.10.2:8000")!
+        return URL(string: "http://172.20.10.2:8080")!
     }
     
     public var path: String {

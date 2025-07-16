@@ -53,7 +53,7 @@ final class QuizViewController: BaseViewController<QuizViewModel>, UICollectionV
     internal override func bind() {
         let input = QuizViewModel.Input(fetchTrigger: fetchTrigger.asObservable())
         let output = viewModel.transform(input: input)
-        
+
         output.quizIds
             .drive(onNext: { [weak self] ids in
                 guard let self = self else { return }
@@ -61,7 +61,28 @@ final class QuizViewController: BaseViewController<QuizViewModel>, UICollectionV
                 print("Fetched Quiz IDs: \(ids)")
             })
             .disposed(by: disposeBag)
+        
+        // ✅ 추가해야 함: output.quiz 구독
+        output.quiz
+            .drive(onNext: { [weak self] quiz in
+                guard let self = self else { return }
+                self.questionLabel.text = quiz.question
+                self.coinPriceLabel.text = "조코 \(quiz.coin)"
+                
+                if let url = URL(string: quiz.imageurl) {
+                    DispatchQueue.global().async {
+                        if let data = try? Data(contentsOf: url),
+                           let image = UIImage(data: data) {
+                            DispatchQueue.main.async {
+                                self.quizImageView.image = image
+                            }
+                        }
+                    }
+                }
+            })
+            .disposed(by: disposeBag)
     }
+
 
     public override func addView() {
         [coinPriceLabel, quizImageView, questionLabel, oxCollectionView].forEach { view.addSubview($0) }

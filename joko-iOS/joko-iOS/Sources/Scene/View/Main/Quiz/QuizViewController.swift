@@ -18,11 +18,27 @@ final class QuizViewController: BaseViewController<QuizViewModel> {
         $0.textColor = .white1
     }
     
+    private lazy var oxCollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.itemSize = CGSize(width: 144, height: 160)
+        layout.minimumInteritemSpacing = 20
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .clear
+        collectionView.register(OXCollectionViewCell.self, forCellWithReuseIdentifier: OXCollectionViewCell.identifier)
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        return collectionView
+    }()
+    
     public override func addView() {
         [
             coinPriceLabel,
             quizImageView,
-            questionLabel
+            questionLabel,
+            oxCollectionView
         ].forEach { view.addSubview($0) }
     }
     
@@ -45,5 +61,28 @@ final class QuizViewController: BaseViewController<QuizViewModel> {
             $0.top.equalTo(quizImageView.snp.bottom).offset(32)
             $0.centerX.equalToSuperview()
         }
+        oxCollectionView.snp.makeConstraints {
+            $0.top.equalTo(questionLabel.snp.bottom).offset(60)
+            $0.centerX.equalToSuperview()
+            $0.width.equalTo(308) // 144 + 20 + 144
+            $0.height.equalTo(160)
+        }
+    }
+}
+
+extension QuizViewController: UICollectionViewDataSource, UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 2 // O, X 두 개
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: OXCollectionViewCell.identifier, for: indexPath) as? OXCollectionViewCell else {
+            return UICollectionViewCell()
+        }
+        
+        let isOSelected = indexPath.item == 0
+        cell.configure(isOSelected: isOSelected)
+        
+        return cell
     }
 }

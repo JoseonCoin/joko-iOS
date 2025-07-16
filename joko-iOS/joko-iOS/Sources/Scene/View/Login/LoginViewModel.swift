@@ -4,7 +4,6 @@ import RxCocoa
 import Moya
 import Alamofire
 
-// MARK: - LoginViewModel
 
 public class LoginViewModel: BaseViewModel {
     

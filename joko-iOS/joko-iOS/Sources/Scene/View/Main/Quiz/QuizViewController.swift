@@ -40,10 +40,10 @@ final class QuizViewController: BaseViewController<QuizViewModel>, UICollectionV
         return collectionView
     }()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        bind()
-    }
+//    override func viewDidLoad() {
+//        super.viewDidLoad()
+//        bind()
+//    }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -61,15 +61,14 @@ final class QuizViewController: BaseViewController<QuizViewModel>, UICollectionV
                 print("Fetched Quiz IDs: \(ids)")
             })
             .disposed(by: disposeBag)
-        
-        // ✅ 추가해야 함: output.quiz 구독
+
         output.quiz
             .drive(onNext: { [weak self] quiz in
                 guard let self = self else { return }
                 self.questionLabel.text = quiz.question
-                self.coinPriceLabel.text = "조코 \(quiz.coin)"
+                self.coinPriceLabel.text = " \(quiz.coin)조코"
                 
-                if let url = URL(string: quiz.imageurl) {
+                if let url = URL(string: quiz.imageUrl) {
                     DispatchQueue.global().async {
                         if let data = try? Data(contentsOf: url),
                            let image = UIImage(data: data) {
@@ -115,10 +114,8 @@ final class QuizViewController: BaseViewController<QuizViewModel>, UICollectionV
         }
     }
 
-    // MARK: - UICollectionViewDataSource
-
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 2 // O, X
+        return 2
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

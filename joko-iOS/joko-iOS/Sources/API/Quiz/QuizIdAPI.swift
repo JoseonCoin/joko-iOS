@@ -6,17 +6,26 @@ enum QuizIdAPI {
     case fetchOneQuiz(id: Int)
 }
 
-struct Quiz: Codable {
+struct Quiz: Decodable {
     let quizId: Int
     let question: String
     let options: [String]
     let coin: Int
-    let imageurl: String
+    let imageUrl: String
+
+    enum CodingKeys: String, CodingKey {
+        case quizId = "id"
+        case question
+        case options
+        case coin
+        case imageUrl
+    }
 }
+
 
 extension QuizIdAPI: TargetType {
     var baseURL: URL {
-        return URL(string: "http://172.20.10.2:8080")!
+        return URL(string: "http://localhost:8080")!
     }
 
     var path: String {

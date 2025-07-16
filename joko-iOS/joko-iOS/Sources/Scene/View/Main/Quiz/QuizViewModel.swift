@@ -42,7 +42,7 @@ public class QuizViewModel: BaseViewModel {
                     .map(Quiz.self)
                     .asObservable()
                     .catchAndReturn(
-                        Quiz(quizId: 0, question: "불러오기 실패", options: [], coin: 0, imageurl: "")
+                        Quiz(quizId: 0, question: "불러오기 실패", options: [], coin: 0, imageUrl: "")
                     )
             }
             .asDriver(onErrorDriveWith: .empty())

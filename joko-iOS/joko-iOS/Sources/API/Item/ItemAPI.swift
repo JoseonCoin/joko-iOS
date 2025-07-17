@@ -13,7 +13,7 @@ extension ItemAPI: TargetType {
     var path: String {
         switch self {
         case .fetchUserItems:
-            return "/item/user"
+            return "/item/users"
         }
     }
     

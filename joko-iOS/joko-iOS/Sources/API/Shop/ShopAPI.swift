@@ -3,8 +3,6 @@ import RxSwift
 import Moya
 import RxMoya
 
-// MARK: - 모델
-
 struct ShopItem: Codable {
     let itemId: Int
     let name: String
@@ -21,7 +19,6 @@ struct RankItemGroup: Codable {
     let items: [ShopItem]
 }
 
-// MARK: - API 정의
 
 enum ShopAPI {
     case getAllItems
@@ -35,7 +32,7 @@ extension ShopAPI: TargetType {
     var path: String {
         switch self {
         case .getAllItems:
-            return "/shop/all"
+            return "/item/all"
         }
     }
 
@@ -48,12 +45,19 @@ extension ShopAPI: TargetType {
     }
 
     var headers: [String: String]? {
-        return [
-            "Authorization": "Bearer \(UserDefaults.standard.string(forKey: "access_token") ?? "")",
-            "Content-Type": "application/json"
-        ]
+        var headers: [String: String] = [:]
+        let token = UserDefaults.standard.string(forKey: "access_token") ?? ""
+        if token.isEmpty {
+            print("🚨 [ShopAPI] ⚠️ access_token is empty!")
+        } else {
+            print("✅ [ShopAPI] Using access_token: \(token)")
+            headers["Authorization"] = "Bearer \(token)"
+        }
+        headers["Content-Type"] = "application/json"
+        return headers
     }
 }
+
 
 // MARK: - 에러 정의
 
@@ -66,10 +70,24 @@ enum ShopAPIError: Error {
 
 final class ShopService {
     static let shared = ShopService()
-    private let provider = MoyaProvider<ShopAPI>()
+    private let provider = MoyaProvider<ShopAPI>(plugins: [NetworkLoggerPlugin(configuration: .init(logOptions: .verbose))])
 
     func fetchAllItems() -> Single<[RankItemGroup]> {
+        print("🟡 [ShopService] fetchAllItems() called")
         return provider.rx.request(.getAllItems)
+            .do(onSubscribe: {
+                print("📡 [ShopService] Sending request to \(ShopAPI.getAllItems.path)")
+            })
+            .map { response in
+                print("🔵 [ShopService] Received response — statusCode: \(response.statusCode), dataLength: \(response.data.count)")
+                if let responseString = String(data: response.data, encoding: .utf8) {
+                    print("📄 [ShopService] Response body: \(responseString)")
+                }
+                return response
+            }
+            .do(onError: { error in
+                print("🔴 [ShopService] Request failed with error: \(error)")
+            })
             .filterSuccessfulStatusCodes()
             .flatMap { response -> Single<[RankItemGroup]> in
                 return self.parseRankItemGroups(from: response.data)
@@ -88,6 +106,9 @@ final class ShopService {
             return Single.just(groups)
         } catch {
             print("🔴 [ShopService] Decoding error: \(error)")
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("📄 [ShopService] Raw response body for debugging:\n\(responseString)")
+            }
             return Single.error(ShopAPIError.decodingError)
         }
     }

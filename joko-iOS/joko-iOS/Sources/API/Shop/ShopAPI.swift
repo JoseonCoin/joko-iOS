@@ -1,27 +1,14 @@
-import Foundation
-import RxSwift
 import Moya
+import Foundation
 import RxMoya
-
-struct ShopItem: Codable {
-    let itemId: Int
-    let name: String
-    let price: Int
-    let imageUrl: String?
-
-    var displayName: String {
-        return name.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-}
-
-struct RankItemGroup: Codable {
-    let rank: String
-    let items: [ShopItem]
-}
-
+import UIKit
+import RxSwift
+import RxCocoa
 
 enum ShopAPI {
     case getAllItems
+    case buy(userId: Int, itemId: Int)
+    case sell(userItemId: Int)
 }
 
 extension ShopAPI: TargetType {
@@ -33,16 +20,44 @@ extension ShopAPI: TargetType {
         switch self {
         case .getAllItems:
             return "/item/all"
+        case .buy:
+            return "/item/buy"
+        case .sell:
+            return "/item/sell"
         }
     }
 
     var method: Moya.Method {
-        return .get
+        switch self {
+        case .getAllItems:
+            return .get
+        case .buy:
+            return .post
+        case .sell:
+            return .post
+        }
     }
 
     var task: Task {
-        return .requestPlain
+        switch self {
+        case .getAllItems:
+            return .requestPlain
+
+        case let .buy(userId, itemId):
+            let body: [String: Any] = [
+                "userId": userId,
+                "itemId": itemId
+            ]
+            return .requestParameters(parameters: body, encoding: JSONEncoding.default)
+
+        case let .sell(userItemId):
+            let params: [String: Any] = [
+                "userItemId": userItemId
+            ]
+            return .requestParameters(parameters: params, encoding: URLEncoding.queryString)
+        }
     }
+
 
     var headers: [String: String]? {
         var headers: [String: String] = [:]
@@ -59,6 +74,7 @@ extension ShopAPI: TargetType {
 }
 
 
+
 // MARK: - 에러 정의
 
 enum ShopAPIError: Error {
@@ -66,12 +82,40 @@ enum ShopAPIError: Error {
     case decodingError
 }
 
-// MARK: - 서비스
-
 final class ShopService {
     static let shared = ShopService()
     private let provider = MoyaProvider<ShopAPI>(plugins: [NetworkLoggerPlugin(configuration: .init(logOptions: .verbose))])
 
+    
+    
+    func sellItem(userItemId: Int) -> Completable {
+         print("🟡 [ShopService] sellItem(userItemId: \(userItemId))")
+         return provider.rx.request(.sell(userItemId: userItemId))
+             .filterSuccessfulStatusCodes()
+             .do(onSuccess: { _ in
+                 print("🟢 [ShopService] 판매 성공 userItemId: \(userItemId)")
+             }, onError: { error in
+                 print("🔴 [ShopService] 판매 실패: \(error)")
+             })
+             .asCompletable()
+     }
+    
+    
+    func buyItem(userId: Int, itemId: Int) -> Single<Int> {
+            print("🟡 [ShopService] buyItem(userId: \(userId), itemId: \(itemId))")
+            return provider.rx.request(.buy(userId: userId, itemId: itemId))
+                .filterSuccessfulStatusCodes()
+                .map { response in
+                    if let json = try? JSONSerialization.jsonObject(with: response.data) as? [String: Any],
+                       let userItemId = json["userItemId"] as? Int {
+                        print("🟢 [ShopService] 구매 성공 userItemId: \(userItemId)")
+                        return userItemId
+                    } else {
+                        print("🔴 [ShopService] 구매 응답 파싱 실패")
+                        throw ShopAPIError.decodingError
+                    }
+                }
+        }
     func fetchAllItems() -> Single<[RankItemGroup]> {
         print("🟡 [ShopService] fetchAllItems() called")
         return provider.rx.request(.getAllItems)

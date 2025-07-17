@@ -151,7 +151,7 @@ final class ShopViewController: BaseViewController<ShopViewModel> {
 
         output.selectedItem
             .drive(onNext: { [weak self] item in
-                print("Selected item: \(item?.displayName ?? "None")")
+                print("Selected item: \(item?.name ?? "None")")
             })
             .disposed(by: disposeBag)
     }

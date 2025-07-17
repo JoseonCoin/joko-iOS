@@ -118,7 +118,7 @@ class ShopCollectionViewCell: UICollectionViewCell {
     }
     
     func configure(with item: ShopItem) {
-        nameLabel.text = item.displayName
+        nameLabel.text = item.name.trimmingCharacters(in: .whitespacesAndNewlines)
         priceLabel.text = "\(item.price)"
         
         if let imageUrl = item.imageUrl, !imageUrl.isEmpty {
@@ -127,6 +127,7 @@ class ShopCollectionViewCell: UICollectionViewCell {
             setDefaultImage()
         }
     }
+
     
     private func loadImage(from urlString: String) {
         guard let url = URL(string: urlString) else {

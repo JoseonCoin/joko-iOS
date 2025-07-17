@@ -11,6 +11,7 @@ final class MyPageViewController: BaseViewController<MypageViewModel> {
     private let loginOutButton = JokoButton(
         buttonText: "로그아웃",
         isHidden: false
+        
     )
     
     public override func addView() {

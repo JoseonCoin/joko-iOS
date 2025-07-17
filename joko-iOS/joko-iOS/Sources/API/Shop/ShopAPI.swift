@@ -23,7 +23,7 @@ enum ShopAPI {
 
 extension ShopAPI: TargetType {
     var baseURL: URL {
-        return URL(string: "http://localhost:8080")!
+        return URL(string: "http://172.20.10.2:8080")!
     }
 
     

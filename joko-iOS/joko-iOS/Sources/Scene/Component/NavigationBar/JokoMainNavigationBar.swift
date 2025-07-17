@@ -1,6 +1,8 @@
 import UIKit
 import SnapKit
 import Then
+import RxSwift
+import RxCocoa
 
 public class JokoMainNavigationBar: UIView {
     weak var parentViewController: UIViewController?
@@ -78,7 +80,6 @@ public class JokoMainNavigationBar: UIView {
     }
     
     @objc private func shopButtonTapped() {
-        // shopButton 탭 애니메이션 (선택사항)
         UIView.animate(withDuration: 0.1, animations: {
             self.shopButton.alpha = 0.7
         }) { _ in
@@ -86,8 +87,6 @@ public class JokoMainNavigationBar: UIView {
                 self.shopButton.alpha = 1.0
             }
         }
-        
-        // ShopViewController로 push 이동
         pushToShopViewController()
     }
     

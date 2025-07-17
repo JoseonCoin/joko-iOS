@@ -9,6 +9,9 @@ final class HomeViewController: BaseViewController<HomeViewModel> {
     private let backGround = UIImageView().then {
         $0.image = UIImage(named: "satto")?.withRenderingMode(.alwaysOriginal)
     }
+    private let eraImageView = UIImageView().then {
+        $0.image = UIImage(named: "underbutton1")?.withRenderingMode(.alwaysOriginal)
+    }
     private let coinLabel = UILabel().then {
         $0.font = UIFont.JokoFont(.semiBold2)
         $0.text = "코인 불러오는중..."
@@ -65,6 +68,9 @@ final class HomeViewController: BaseViewController<HomeViewModel> {
         
         // 직업에 따라 배경 이미지 변경
         updateBackgroundImage(for: userInfo.job)
+        
+        // 시대에 따라 시대 이미지 변경
+        updateEraImage(for: userInfo.era)
     }
     
     private func updateBackgroundImage(for job: String) {
@@ -86,16 +92,35 @@ final class HomeViewController: BaseViewController<HomeViewModel> {
         case "KING":
             imageName = "king"
         default:
-            imageName = "nobi" // 기본값
+            imageName = "nobi"
         }
         
         backGround.image = UIImage(named: imageName)?.withRenderingMode(.alwaysOriginal)
         print("🖼️ 배경 이미지 변경: \(imageName)")
     }
+    
+    private func updateEraImage(for era: String) {
+        let imageName: String
+        
+        switch era {
+        case "JEON_GI":
+            imageName = "underbutton1"
+        case "JUNG_GI":
+            imageName = "underbutton2"
+        case "HU_GI":
+            imageName = "underbutton3"
+        default:
+            imageName = "underbutton1" // 기본값
+        }
+        
+        eraImageView.image = UIImage(named: imageName)?.withRenderingMode(.alwaysOriginal)
+        print("🏛️ 시대 이미지 변경: \(imageName)")
+    }
 
     public override func addView() {
         [
             backGround,
+            eraImageView,
             itemLabel,
             coinLabel,
             navigationBar
@@ -114,15 +139,22 @@ final class HomeViewController: BaseViewController<HomeViewModel> {
             $0.edges.equalToSuperview()
         }
 
+        eraImageView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(9.5)
+            $0.leading.equalToSuperview().inset(20)
+        }
+        
         navigationBar.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(60)
         }
+        
         coinLabel.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide).inset(12.5)
             $0.trailing.equalToSuperview().inset(80)
         }
+        
         itemLabel.snp.makeConstraints {
             $0.top.equalTo(navigationBar.snp.bottom).offset(504)
             $0.leading.equalToSuperview().inset(25)

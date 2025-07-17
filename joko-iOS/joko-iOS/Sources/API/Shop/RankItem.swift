@@ -12,4 +12,5 @@ struct ShopItem: Codable {
     let name: String
     let imageUrl: String?
     let price: Int
+    let userItemId: Int? // 이 줄 추가
 }

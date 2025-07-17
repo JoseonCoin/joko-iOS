@@ -50,10 +50,24 @@ class ShopCollectionViewCell: UICollectionViewCell {
         $0.color = .white1
         $0.hidesWhenStopped = true
     }
+
+    // 판매하기 버튼 추가
+    private let sellButton = UIButton(type: .system).then {
+        $0.setTitle("판매하기", for: .normal)
+        $0.setTitleColor(.white, for: .normal)
+        $0.backgroundColor = .systemRed
+        $0.layer.cornerRadius = 8
+        $0.titleLabel?.font = .JokoFont(.body3)
+        $0.isHidden = true
+    }
+
+    // 콜백 프로퍼티
+    var onSellButtonTapped: (() -> Void)?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
+        sellButton.addTarget(self, action: #selector(sellButtonTapped), for: .touchUpInside)
     }
     
     required init?(coder: NSCoder) {
@@ -66,11 +80,13 @@ class ShopCollectionViewCell: UICollectionViewCell {
         nameLabel.text = nil
         priceLabel.text = nil
         loadingIndicator.stopAnimating()
+        sellButton.isHidden = true
+        onSellButtonTapped = nil
     }
     
     private func setupUI() {
         contentView.addSubview(containerView)
-        [itemImageView, nameLabel, priceContainer, loadingIndicator].forEach {
+        [itemImageView, nameLabel, priceContainer, loadingIndicator, sellButton].forEach {
             containerView.addSubview($0)
         }
         [coinImageView, priceLabel].forEach {
@@ -101,7 +117,6 @@ class ShopCollectionViewCell: UICollectionViewCell {
             $0.top.equalTo(nameLabel.snp.bottom).offset(8)
             $0.centerX.equalToSuperview()
             $0.height.equalTo(24)
-            $0.bottom.equalToSuperview().inset(16)
         }
         
         coinImageView.snp.makeConstraints {
@@ -115,6 +130,14 @@ class ShopCollectionViewCell: UICollectionViewCell {
             $0.trailing.equalToSuperview().inset(8)
             $0.centerY.equalToSuperview()
         }
+
+        sellButton.snp.makeConstraints {
+            $0.top.equalTo(priceContainer.snp.bottom).offset(8)
+            $0.centerX.equalToSuperview()
+            $0.width.equalTo(80)
+            $0.height.equalTo(32)
+            $0.bottom.lessThanOrEqualToSuperview().inset(8)
+        }
     }
     
     func configure(with item: ShopItem) {
@@ -126,8 +149,17 @@ class ShopCollectionViewCell: UICollectionViewCell {
         } else {
             setDefaultImage()
         }
+        // 판매하기 버튼 노출 조건
+        if let userItemId = item.userItemId, userItemId > 0 {
+            sellButton.isHidden = false
+        } else {
+            sellButton.isHidden = true
+        }
     }
 
+    @objc private func sellButtonTapped() {
+        onSellButtonTapped?()
+    }
     
     private func loadImage(from urlString: String) {
         guard let url = URL(string: urlString) else {

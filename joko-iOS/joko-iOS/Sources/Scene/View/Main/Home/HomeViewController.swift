@@ -341,9 +341,16 @@ class ItemCollectionViewCell: UICollectionViewCell {
             itemImageView.alpha = 0.5
         }
         
-        // 이미지 로드 (Kingfisher 사용)
+        // Kingfisher 없이 이미지 로드
         if let url = URL(string: item.imageUrl) {
-            itemImageView.kf.setImage(with: url, placeholder: UIImage(named: "placeholder_item"))
+            itemImageView.image = UIImage(named: "placeholder_item")
+            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
+                    DispatchQueue.main.async {
+                        self?.itemImageView.image = image
+                    }
+                }
+            }
         } else {
             itemImageView.image = UIImage(named: "placeholder_item")
         }

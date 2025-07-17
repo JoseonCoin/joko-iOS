@@ -28,7 +28,7 @@ public class HomeViewModel: BaseViewModel {
 
     public func transform(input: Input) -> Output {
         input.appearTrigger
-            .take(1) // 첫 번째 이벤트만 처리
+            
             .do(onNext: { [weak self] in
                 print("🔄 홈 화면 나타남 - 데이터 새로고침 시작")
                 self?.isLoadingRelay.accept(true)

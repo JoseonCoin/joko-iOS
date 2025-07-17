@@ -15,7 +15,6 @@ final class MyPageViewController: BaseViewController<MypageViewModel> {
         $0.backgroundColor = .clear
     }
     
-    
     public override func addView() {
         view.addSubview(loginOutButton)
         view.addSubview(myPageImageView)

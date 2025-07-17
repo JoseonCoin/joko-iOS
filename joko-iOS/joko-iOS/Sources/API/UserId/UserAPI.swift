@@ -4,6 +4,7 @@ import Moya
 enum UserAPI {
     case fetchUserId
     case fetchUserInfo(userId: Int)
+    case changeEra(userId: Int, era: String) // 추가
 }
 
 extension UserAPI: TargetType {
@@ -17,11 +18,18 @@ extension UserAPI: TargetType {
             return "/user/id"
         case .fetchUserInfo:
             return "/user/info"
+        case .changeEra:
+            return "/user/change"
         }
     }
     
     var method: Moya.Method {
-        return .get
+        switch self {
+        case .changeEra:
+            return .post // 서버가 GET이면 .get으로 바꿔도 됨
+        default:
+            return .get
+        }
     }
     
     var task: Task {
@@ -31,6 +39,12 @@ extension UserAPI: TargetType {
         case .fetchUserInfo(let userId):
             return .requestParameters(
                 parameters: ["userId": userId],
+                encoding: URLEncoding.queryString
+            )
+        case .changeEra(let userId, let era):
+            // 쿼리 파라미터 방식
+            return .requestParameters(
+                parameters: ["userId": userId, "era": era],
                 encoding: URLEncoding.queryString
             )
         }

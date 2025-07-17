@@ -3,7 +3,7 @@ import UIKit
 public class TabBarController: BaseTabBarController {
     override public func viewDidLoad() {
         super.viewDidLoad()
-        self.animationType = .slide
+        self.animationType = .fade
         let homeVC = UINavigationController(rootViewController: HomeViewController(viewModel: HomeViewModel()))
         homeVC.tabBarItem = JokoTabBarTypeItem(.home)
         

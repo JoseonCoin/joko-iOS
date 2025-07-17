@@ -9,6 +9,7 @@ public class HomeViewModel: BaseViewModel {
     
     private let userIdRelay = BehaviorRelay<Int?>(value: nil)
     private let userInfoRelay = BehaviorRelay<UserInfoResponse?>(value: nil)
+    private let isLoadingRelay = BehaviorRelay<Bool>(value: false)
     
     public var userId: Int? {
         return userIdRelay.value
@@ -25,34 +26,51 @@ public class HomeViewModel: BaseViewModel {
     public struct Output {
         let userId: Observable<Int?>
         let userInfo: Observable<UserInfoResponse?>
+        let isLoading: Observable<Bool>
     }
     
     public init() {}
     
     public func transform(input: Input) -> Output {
         input.appearTrigger
+            .do(onNext: { [weak self] in
+                print("🔄 홈 화면 나타남 - 데이터 새로고침 시작")
+                self?.isLoadingRelay.accept(true)
+            })
             .debounce(.milliseconds(300), scheduler: MainScheduler.instance) // 중복 호출 방지
-            .flatMapLatest { [weak self] _ -> Observable<Int?> in
-                guard let self = self else { return .just(nil) }
+            .flatMapLatest { [weak self] _ -> Observable<(Int?, UserInfoResponse?)> in
+                guard let self = self else { return .just((nil, nil)) }
+
                 return self.fetchUserId()
+                    .flatMapLatest { userId -> Observable<(Int?, UserInfoResponse?)> in
+                        guard let userId = userId else {
+                            print("❌ userId가 없어서 userInfo 호출 불가")
+                            return .just((nil, nil))
+                        }
+                        
+                        // 2. userId를 사용해서 userInfo 호출
+                        return self.fetchUserInfo(userId: userId)
+                            .map { userInfo in
+                                return (userId, userInfo)
+                            }
+                    }
             }
-            .bind(to: userIdRelay)
-            .disposed(by: disposeBag)
-        
-        // userId가 변경될 때마다 userInfo 가져오기
-        userIdRelay
-            .compactMap { $0 } // nil이 아닌 경우만
-            .distinctUntilChanged() // 같은 userId 중복 호출 방지
-            .flatMapLatest { [weak self] userId -> Observable<UserInfoResponse?> in
-                guard let self = self else { return .just(nil) }
-                return self.fetchUserInfo(userId: userId)
-            }
-            .bind(to: userInfoRelay)
+            .do(onNext: { [weak self] (userId, userInfo) in
+                // 로딩 완료
+                self?.isLoadingRelay.accept(false)
+                print("✅ 두 API 호출 완료 - userId: \(userId ?? 0), userInfo: \(userInfo != nil ? "있음" : "없음")")
+                
+                // 각각의 Relay에 값 전달
+                self?.userIdRelay.accept(userId)
+                self?.userInfoRelay.accept(userInfo)
+            })
+            .subscribe()
             .disposed(by: disposeBag)
         
         return Output(
             userId: userIdRelay.asObservable(),
-            userInfo: userInfoRelay.asObservable()
+            userInfo: userInfoRelay.asObservable(),
+            isLoading: isLoadingRelay.asObservable()
         )
     }
     
@@ -83,6 +101,23 @@ public class HomeViewModel: BaseViewModel {
                 self.handleNetworkError(error)
             })
             .map { try? $0.map(UserInfoResponse.self) }
+            .asObservable()
+            .catchAndReturn(nil)
+    }
+    
+    private let itemProvider = MoyaProvider<ItemAPI>(plugins: [MoyaLoggingPlugin()])
+
+    private func fetchUserItems(userId: Int) -> Observable<UserItemsResponse?> {
+        print("📡 fetchUserItems() 호출됨 - userId: \(userId)")
+        return itemProvider.rx.request(.fetchUserItems(userId: userId))
+            .timeout(.seconds(10), scheduler: MainScheduler.instance)
+            .do(onSuccess: { response in
+                print("✅ userItems 응답 데이터: \(try? response.mapString())")
+            }, onError: { error in
+                print("❌ userItems 에러 발생: \(error)")
+                self.handleNetworkError(error)
+            })
+            .map { try? $0.map(UserItemsResponse.self) }
             .asObservable()
             .catchAndReturn(nil)
     }

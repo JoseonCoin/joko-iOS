@@ -13,13 +13,13 @@ final class ChangeEraViewController: BaseViewController<ChangeEraViewModel> {
     
     private let coinLabel = UILabel().then {
         $0.font = UIFont.JokoFont(.body2)
-        $0.text = "0"  // 초기값을 0으로 설정
+        $0.text = "0"
         $0.textColor = .white1
     }
     
     
     private let coinImageView = UIImageView().then {
-        $0.image = UIImage(named: "coin_icon")?.withRenderingMode(.alwaysOriginal)
+        $0.image = UIImage(named: "PlainCoin")?.withRenderingMode(.alwaysOriginal)
     }
     
     private let explainLabel1 = UILabel().then {

@@ -12,6 +12,9 @@ final class HomeViewController: BaseViewController<HomeViewModel> {
     private let eraImageView = UIImageView().then {
         $0.image = UIImage(named: "underbutton1")?.withRenderingMode(.alwaysOriginal)
     }
+    private let coinImageView = UIImageView().then {
+         $0.image = UIImage(named: "PlainCoin")?.withRenderingMode(.alwaysOriginal)
+    }
     private let coinLabel = UILabel().then {
         $0.font = UIFont.JokoFont(.semiBold2)
         $0.text = "코인 불러오는중..."
@@ -31,6 +34,7 @@ final class HomeViewController: BaseViewController<HomeViewModel> {
 
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        print("📱 viewWillAppear - 홈 화면 나타남")
         appearTrigger.accept(())
     }
 
@@ -55,6 +59,20 @@ final class HomeViewController: BaseViewController<HomeViewModel> {
                 self?.updateUI(with: userInfo)
             })
             .disposed(by: disposeBag)
+            
+        // 로딩 상태 처리
+        output.isLoading
+            .subscribe(onNext: { [weak self] isLoading in
+                self?.handleLoadingState(isLoading)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func handleLoadingState(_ isLoading: Bool) {
+        if isLoading {
+            coinLabel.text = "코인 불러오는중..."
+            print("🔄 로딩 중...")
+        }
     }
     
     private func updateUI(with userInfo: UserInfoResponse) {
@@ -65,11 +83,7 @@ final class HomeViewController: BaseViewController<HomeViewModel> {
         
         itemLabel.text = "\(userInfo.rank)이 획득한 아이템"
         coinLabel.text = "\(userInfo.coin)"
-        
-        // 직업에 따라 배경 이미지 변경
         updateBackgroundImage(for: userInfo.job)
-        
-        // 시대에 따라 시대 이미지 변경
         updateEraImage(for: userInfo.era)
     }
     
@@ -121,6 +135,7 @@ final class HomeViewController: BaseViewController<HomeViewModel> {
         [
             backGround,
             eraImageView,
+            coinImageView,
             itemLabel,
             coinLabel,
             navigationBar
@@ -143,6 +158,7 @@ final class HomeViewController: BaseViewController<HomeViewModel> {
             $0.top.equalTo(view.safeAreaLayoutGuide).offset(9.5)
             $0.leading.equalToSuperview().inset(20)
         }
+      
         
         navigationBar.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide)
@@ -153,6 +169,12 @@ final class HomeViewController: BaseViewController<HomeViewModel> {
         coinLabel.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide).inset(12.5)
             $0.trailing.equalToSuperview().inset(80)
+        }
+        
+        coinImageView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide).inset(8.5)
+            $0.trailing.equalToSuperview().inset(115)
+            $0.width.height.equalTo(28)
         }
         
         itemLabel.snp.makeConstraints {

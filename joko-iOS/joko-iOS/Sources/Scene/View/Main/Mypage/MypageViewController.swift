@@ -5,14 +5,16 @@ import Then
 final class MyPageViewController: BaseViewController<MypageViewModel> {
     
     private let myPageImageView = UIImageView().then {
-        $0.image = UIImage(named: "mypage")?.withRenderingMode(.alwaysOriginal)
+        $0.image = UIImage(named: "mypageview")?.withRenderingMode(.alwaysOriginal)
     }
     
     private let loginOutButton = JokoButton(
         buttonText: "로그아웃",
         isHidden: false
-        
-    )
+    ).then {
+        $0.backgroundColor = .clear
+    }
+    
     
     public override func addView() {
         view.addSubview(loginOutButton)
@@ -22,13 +24,14 @@ final class MyPageViewController: BaseViewController<MypageViewModel> {
     public override func attribute() {
         view.backgroundColor = .background
         hideKeyboardWhenTappedAround()
+        loginOutButton.backgroundColor = .clear
         
         loginOutButton.addTarget(self, action: #selector(logoutTapped), for: .touchUpInside)
     }
     
     public override func setLayout() {
         loginOutButton.snp.makeConstraints {
-            $0.top.equalTo(640)
+            $0.top.equalTo(665)
             $0.leading.trailing.equalToSuperview().inset(20)
             $0.width.equalTo(350)
             $0.height.equalTo(60)

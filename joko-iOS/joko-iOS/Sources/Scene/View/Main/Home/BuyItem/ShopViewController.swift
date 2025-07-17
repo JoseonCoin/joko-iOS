@@ -197,7 +197,7 @@ extension ShopViewController: UICollectionViewDelegateFlowLayout {
         let padding: CGFloat = 16
         let availableWidth = collectionView.frame.width - padding
         let itemWidth = availableWidth / 2
-        return CGSize(width: itemWidth, height: 140)
+        return CGSize(width: itemWidth, height: 200)
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {

@@ -4,7 +4,6 @@ import Then
 import RxSwift
 import RxCocoa
 
-
 class ShopCollectionViewCell: UICollectionViewCell {
     static let identifier = "ShopCollectionViewCell"
     
@@ -28,7 +27,8 @@ class ShopCollectionViewCell: UICollectionViewCell {
         $0.font = .JokoFont(.body2)
         $0.textColor = .white1
         $0.textAlignment = .center
-        $0.numberOfLines = 2
+        $0.numberOfLines = 0
+        $0.lineBreakMode = .byWordWrapping
     }
     
     private let priceContainer = UIView().then {
@@ -94,6 +94,7 @@ class ShopCollectionViewCell: UICollectionViewCell {
         nameLabel.snp.makeConstraints {
             $0.top.equalTo(itemImageView.snp.bottom).offset(12)
             $0.leading.trailing.equalToSuperview().inset(8)
+            $0.bottom.lessThanOrEqualTo(priceContainer.snp.top).offset(-8)
         }
         
         priceContainer.snp.makeConstraints {
@@ -120,7 +121,6 @@ class ShopCollectionViewCell: UICollectionViewCell {
         nameLabel.text = item.displayName
         priceLabel.text = "\(item.price)"
         
-        // 이미지 로딩 처리
         if let imageUrl = item.imageUrl, !imageUrl.isEmpty {
             loadImage(from: imageUrl)
         } else {

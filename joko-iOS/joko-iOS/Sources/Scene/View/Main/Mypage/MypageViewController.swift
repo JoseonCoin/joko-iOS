@@ -1,29 +1,44 @@
 import UIKit
+import SnapKit
+import Then
 
-final class MyPageViewController: UIViewController {
-    private let 
+final class MyPageViewController: BaseViewController<MypageViewModel> {
     
-    
+    private let myPageImageView = UIImageView().then {
+        $0.image = UIImage(named: "mypage")?.withRenderingMode(.alwaysOriginal)
+    }
     
     private let loginOutButton = JokoButton(
         buttonText: "로그아웃",
         isHidden: false
     )
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .blue
-        title = "마이페이지"
-
+    
+    public override func addView() {
         view.addSubview(loginOutButton)
-        loginOutButton.snp.makeConstraints {
-            $0.centerX.centerY.equalToSuperview()
-            $0.width.height.equalTo(100)
-        }
-
+        view.addSubview(myPageImageView)
+    }
+    
+    public override func attribute() {
+        view.backgroundColor = .background
+        hideKeyboardWhenTappedAround()
+        
         loginOutButton.addTarget(self, action: #selector(logoutTapped), for: .touchUpInside)
     }
+    
+    public override func setLayout() {
+        loginOutButton.snp.makeConstraints {
+            $0.top.equalTo(640)
+            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.width.equalTo(350)
+            $0.height.equalTo(60)
+        }
 
+        myPageImageView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(32)
+            $0.leading.trailing.equalToSuperview().inset(20)
+        }
+    }
+    
     @objc private func logoutTapped() {
         let alert = UIAlertController(title: "로그아웃", message: "정말 로그아웃 하시겠습니까?", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "취소", style: .cancel, handler: nil))
@@ -32,17 +47,17 @@ final class MyPageViewController: UIViewController {
         })
         present(alert, animated: true, completion: nil)
     }
-
+    
     private func logout() {
         UserDefaults.standard.removeObject(forKey: "access_token")
         UserDefaults.standard.removeObject(forKey: "refresh_token")
-
+        
         guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let sceneDelegate = scene.delegate as? SceneDelegate else { return }
-
+        
         let loginVC = LoginViewController(viewModel: LoginViewModel())
         let navController = UINavigationController(rootViewController: loginVC)
-
+        
         UIView.transition(with: sceneDelegate.window!,
                           duration: 0.3,
                           options: .transitionFlipFromRight,

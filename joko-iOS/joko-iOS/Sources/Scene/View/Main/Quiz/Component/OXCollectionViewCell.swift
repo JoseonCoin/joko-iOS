@@ -6,17 +6,18 @@ import RxCocoa
 
 public class OXCollectionViewCell: UICollectionViewCell {
     static let identifier = "OXCollectionViewCell"
-    
+
     private let quizOImageView = UIImageView().then {
         $0.image = UIImage(named: "quizO")?.withRenderingMode(.alwaysOriginal)
     }
-    
+
     private let quizXImageView = UIImageView().then {
         $0.image = UIImage(named: "quizX")?.withRenderingMode(.alwaysOriginal)
     }
     
     private let backView = UIView().then {
         $0.backgroundColor = .middleBlack
+        $0.layer.cornerRadius = 8
     }
     
     override init(frame: CGRect) {

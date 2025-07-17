@@ -1,6 +1,5 @@
 import UIKit
 
-// MARK: - BaseTabBarController
 public class BaseTabBarController: UITabBarController {
     public enum AnimationType {
         case slide
@@ -9,15 +8,16 @@ public class BaseTabBarController: UITabBarController {
         case flip
         case bounce
         case spring
+        case none
     }
-    
-    public var animationType: AnimationType = .spring
-    
+
+    public var animationType: AnimationType = .none
+
     public override func viewDidLoad() {
         super.viewDidLoad()
         setupTabBar()
     }
-    
+
     private func setupTabBar() {
         self.tabBar.tintColor = .main
         self.tabBar.isTranslucent = false
@@ -37,6 +37,11 @@ extension BaseTabBarController: UITabBarControllerDelegate {
         animationControllerForTransitionFrom fromVC: UIViewController,
         to toVC: UIViewController
     ) -> UIViewControllerAnimatedTransitioning? {
+        // 애니메이션 타입이 none이면 nil 반환 (기본 전환 사용)
+        if animationType == .none {
+            return nil
+        }
+        
         switch animationType {
         case .slide:
             return SlideTransitionAnimator(viewControllers: viewControllers)
@@ -50,305 +55,262 @@ extension BaseTabBarController: UITabBarControllerDelegate {
             return BounceTransitionAnimator(viewControllers: viewControllers)
         case .spring:
             return SpringTransitionAnimator(viewControllers: viewControllers)
+        case .none:
+            return nil
         }
     }
 }
 
+// MARK: - Slide Transition Animator
 class SlideTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     let viewControllers: [UIViewController]?
     let transitionDuration: Double = 0.35
-    
+
     init(viewControllers: [UIViewController]?) {
         self.viewControllers = viewControllers
     }
-    
+
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return TimeInterval(transitionDuration)
+        return transitionDuration
     }
-    
+
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         guard let fromVC = transitionContext.viewController(forKey: .from),
-              let fromView = fromVC.view,
-              let fromIndex = getIndex(forViewController: fromVC),
               let toVC = transitionContext.viewController(forKey: .to),
-              let toView = toVC.view,
-              let toIndex = getIndex(forViewController: toVC)
+              let fromIndex = getIndex(for: fromVC),
+              let toIndex = getIndex(for: toVC)
         else {
             transitionContext.completeTransition(false)
             return
         }
-        
+
+        let container = transitionContext.containerView
         let frame = transitionContext.initialFrame(for: fromVC)
-        var fromFrameEnd = frame
-        var toFrameStart = frame
-        fromFrameEnd.origin.x = toIndex > fromIndex ? -frame.width : +frame.width
-        toFrameStart.origin.x = toIndex > fromIndex ? +frame.width : -frame.width
-        toView.frame = toFrameStart
-        
-        transitionContext.containerView.addSubview(toView)
-        
-        UIView.animate(withDuration: transitionDuration, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.5, options: [.curveEaseInOut]) {
-            fromView.frame = fromFrameEnd
-            toView.frame = frame
-        } completion: { success in
-            fromView.removeFromSuperview()
-            transitionContext.completeTransition(success)
-        }
+
+        var toStart = frame
+        toStart.origin.x = toIndex > fromIndex ? frame.width : -frame.width
+        toVC.view.frame = toStart
+
+        container.addSubview(toVC.view)
+
+        UIView.animate(withDuration: transitionDuration, animations: {
+            fromVC.view.frame.origin.x = toIndex > fromIndex ? -frame.width : frame.width
+            toVC.view.frame = frame
+        }, completion: { finished in
+            // 상태 복원
+            fromVC.view.frame = frame
+            transitionContext.completeTransition(finished)
+        })
     }
-    
-    func getIndex(forViewController vc: UIViewController) -> Int? {
-        guard let viewControllers = self.viewControllers else { return nil }
-        for (index, viewController) in viewControllers.enumerated() {
-            if viewController == vc { return index }
-        }
-        return nil
+
+    private func getIndex(for vc: UIViewController) -> Int? {
+        viewControllers?.firstIndex(where: { $0 == vc })
     }
 }
 
-// MARK: - 2. 페이드 애니메이션
+// MARK: - Fade Transition Animator
 class FadeTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     let transitionDuration: Double = 0.25
-    
+
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return TimeInterval(transitionDuration)
+        transitionDuration
     }
-    
+
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         guard let fromView = transitionContext.view(forKey: .from),
               let toView = transitionContext.view(forKey: .to) else {
             transitionContext.completeTransition(false)
             return
         }
-        
-        let containerView = transitionContext.containerView
+
+        let container = transitionContext.containerView
         toView.alpha = 0
-        containerView.addSubview(toView)
-        
-        UIView.animate(withDuration: transitionDuration, delay: 0, options: [.curveEaseInOut]) {
+        container.addSubview(toView)
+
+        UIView.animate(withDuration: transitionDuration, animations: {
             fromView.alpha = 0
             toView.alpha = 1
-        } completion: { success in
-            fromView.removeFromSuperview()
-            transitionContext.completeTransition(success)
-        }
+        }, completion: { finished in
+            // 상태 복원
+            fromView.alpha = 1
+            transitionContext.completeTransition(finished)
+        })
     }
 }
 
-// MARK: - 3. 스케일 애니메이션
+// MARK: - Scale Transition Animator
 class ScaleTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     let viewControllers: [UIViewController]?
     let transitionDuration: Double = 0.3
-    
+
     init(viewControllers: [UIViewController]?) {
         self.viewControllers = viewControllers
     }
-    
+
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return TimeInterval(transitionDuration)
+        transitionDuration
     }
-    
+
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         guard let fromVC = transitionContext.viewController(forKey: .from),
-              let fromView = fromVC.view,
-              let fromIndex = getIndex(forViewController: fromVC),
-              let toVC = transitionContext.viewController(forKey: .to),
-              let toView = toVC.view,
-              let toIndex = getIndex(forViewController: toVC)
-        else {
+              let toVC = transitionContext.viewController(forKey: .to) else {
             transitionContext.completeTransition(false)
             return
         }
-        
-        let containerView = transitionContext.containerView
+
+        let container = transitionContext.containerView
         let frame = transitionContext.initialFrame(for: fromVC)
         
-        toView.frame = frame
-        toView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
-        toView.alpha = 0
-        
-        containerView.addSubview(toView)
-        
-        UIView.animate(withDuration: transitionDuration, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.5, options: [.curveEaseInOut]) {
-            fromView.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
-            fromView.alpha = 0
-            toView.transform = CGAffineTransform.identity
-            toView.alpha = 1
-        } completion: { success in
-            fromView.removeFromSuperview()
-            fromView.transform = CGAffineTransform.identity
-            transitionContext.completeTransition(success)
-        }
-    }
-    
-    func getIndex(forViewController vc: UIViewController) -> Int? {
-        guard let viewControllers = self.viewControllers else { return nil }
-        for (index, viewController) in viewControllers.enumerated() {
-            if viewController == vc { return index }
-        }
-        return nil
+        // 초기 상태 설정
+        toVC.view.frame = frame
+        toVC.view.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+        toVC.view.alpha = 0
+        container.addSubview(toVC.view)
+
+        UIView.animate(withDuration: transitionDuration, animations: {
+            fromVC.view.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+            fromVC.view.alpha = 0
+            toVC.view.transform = .identity
+            toVC.view.alpha = 1
+        }, completion: { finished in
+            // 상태 복원
+            fromVC.view.transform = .identity
+            fromVC.view.alpha = 1
+            transitionContext.completeTransition(finished)
+        })
     }
 }
 
-// MARK: - 4. 플립 애니메이션
+// MARK: - Flip Transition Animator
 class FlipTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     let viewControllers: [UIViewController]?
     let transitionDuration: Double = 0.5
-    
+
     init(viewControllers: [UIViewController]?) {
         self.viewControllers = viewControllers
     }
-    
+
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return TimeInterval(transitionDuration)
+        transitionDuration
     }
-    
+
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        guard let fromVC = transitionContext.viewController(forKey: .from),
-              let fromView = fromVC.view,
-              let fromIndex = getIndex(forViewController: fromVC),
+        guard let fromView = transitionContext.view(forKey: .from),
+              let toView = transitionContext.view(forKey: .to),
+              let fromVC = transitionContext.viewController(forKey: .from),
               let toVC = transitionContext.viewController(forKey: .to),
-              let toView = toVC.view,
-              let toIndex = getIndex(forViewController: toVC)
-        else {
+              let fromIndex = getIndex(for: fromVC),
+              let toIndex = getIndex(for: toVC) else {
             transitionContext.completeTransition(false)
             return
         }
-        
-        let containerView = transitionContext.containerView
-        let frame = transitionContext.initialFrame(for: fromVC)
-        
-        toView.frame = frame
-        containerView.addSubview(toView)
-        
+
         let direction: UIView.AnimationOptions = toIndex > fromIndex ? .transitionFlipFromRight : .transitionFlipFromLeft
+        let container = transitionContext.containerView
         
-        UIView.transition(from: fromView, to: toView, duration: transitionDuration, options: [direction, .curveEaseInOut]) { success in
-            transitionContext.completeTransition(success)
+        // 프레임 설정
+        let frame = transitionContext.initialFrame(for: fromVC)
+        toView.frame = frame
+        
+        UIView.transition(from: fromView, to: toView, duration: transitionDuration, options: [direction, .curveEaseInOut]) { finished in
+            transitionContext.completeTransition(finished)
         }
     }
-    
-    func getIndex(forViewController vc: UIViewController) -> Int? {
-        guard let viewControllers = self.viewControllers else { return nil }
-        for (index, viewController) in viewControllers.enumerated() {
-            if viewController == vc { return index }
-        }
-        return nil
+
+    private func getIndex(for vc: UIViewController) -> Int? {
+        viewControllers?.firstIndex(where: { $0 == vc })
     }
 }
 
-// MARK: - 5. 바운스 애니메이션
+// MARK: - Bounce Transition Animator
 class BounceTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     let viewControllers: [UIViewController]?
     let transitionDuration: Double = 0.6
-    
+
     init(viewControllers: [UIViewController]?) {
         self.viewControllers = viewControllers
     }
-    
+
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return TimeInterval(transitionDuration)
+        transitionDuration
     }
-    
+
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         guard let fromVC = transitionContext.viewController(forKey: .from),
-              let fromView = fromVC.view,
-              let fromIndex = getIndex(forViewController: fromVC),
-              let toVC = transitionContext.viewController(forKey: .to),
-              let toView = toVC.view,
-              let toIndex = getIndex(forViewController: toVC)
-        else {
+              let toVC = transitionContext.viewController(forKey: .to) else {
             transitionContext.completeTransition(false)
             return
         }
-        
-        let containerView = transitionContext.containerView
+
+        let container = transitionContext.containerView
         let frame = transitionContext.initialFrame(for: fromVC)
-        
-        toView.frame = frame
-        toView.transform = CGAffineTransform(translationX: 0, y: frame.height)
-        containerView.addSubview(toView)
-        
-        UIView.animate(withDuration: transitionDuration, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.8, options: [.curveEaseInOut]) {
-            fromView.transform = CGAffineTransform(translationX: 0, y: -frame.height)
-            fromView.alpha = 0.5
-            toView.transform = CGAffineTransform.identity
-        } completion: { success in
-            fromView.removeFromSuperview()
-            fromView.transform = CGAffineTransform.identity
-            fromView.alpha = 1
-            transitionContext.completeTransition(success)
+
+        // 초기 상태 설정
+        toVC.view.frame = frame
+        toVC.view.transform = CGAffineTransform(translationX: 0, y: frame.height)
+        toVC.view.alpha = 1
+        container.addSubview(toVC.view)
+
+        UIView.animate(withDuration: transitionDuration, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.8, options: [.curveEaseInOut]) {
+            fromVC.view.transform = CGAffineTransform(translationX: 0, y: -frame.height * 0.3)
+            fromVC.view.alpha = 0
+            toVC.view.transform = .identity
+            toVC.view.alpha = 1
+        } completion: { finished in
+            // 상태 복원
+            fromVC.view.transform = .identity
+            fromVC.view.alpha = 1
+            transitionContext.completeTransition(finished)
         }
-    }
-    
-    func getIndex(forViewController vc: UIViewController) -> Int? {
-        guard let viewControllers = self.viewControllers else { return nil }
-        for (index, viewController) in viewControllers.enumerated() {
-            if viewController == vc { return index }
-        }
-        return nil
     }
 }
 
-// MARK: - 6. 스프링 애니메이션 (추천!)
+// MARK: - Spring Transition Animator
 class SpringTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     let viewControllers: [UIViewController]?
     let transitionDuration: Double = 0.4
-    
+
     init(viewControllers: [UIViewController]?) {
         self.viewControllers = viewControllers
     }
-    
+
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return TimeInterval(transitionDuration)
+        transitionDuration
     }
-    
+
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         guard let fromVC = transitionContext.viewController(forKey: .from),
-              let fromView = fromVC.view,
-              let fromIndex = getIndex(forViewController: fromVC),
               let toVC = transitionContext.viewController(forKey: .to),
-              let toView = toVC.view,
-              let toIndex = getIndex(forViewController: toVC)
-        else {
+              let fromIndex = getIndex(for: fromVC),
+              let toIndex = getIndex(for: toVC) else {
             transitionContext.completeTransition(false)
             return
         }
-        
-        let containerView = transitionContext.containerView
+
+        let container = transitionContext.containerView
         let frame = transitionContext.initialFrame(for: fromVC)
-        
-        let isMovingRight = toIndex > fromIndex
-        let offsetX = isMovingRight ? frame.width : -frame.width
-        
-        toView.frame = frame
-        toView.transform = CGAffineTransform(translationX: offsetX, y: 0)
-        containerView.addSubview(toView)
-        
-        // 첫 번째 단계: 빠른 이동
-        UIView.animate(withDuration: transitionDuration * 0.6, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 1.0, options: [.curveEaseOut]) {
-            fromView.transform = CGAffineTransform(translationX: -offsetX * 0.3, y: 0)
-            fromView.alpha = 0.7
-            toView.transform = CGAffineTransform(translationX: offsetX * 0.1, y: 0)
-        } completion: { _ in
-            // 두 번째 단계: 부드러운 완료
-            UIView.animate(withDuration: self.transitionDuration * 0.4, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.5, options: [.curveEaseInOut]) {
-                fromView.transform = CGAffineTransform(translationX: -offsetX, y: 0)
-                fromView.alpha = 0
-                toView.transform = CGAffineTransform.identity
-            } completion: { success in
-                fromView.removeFromSuperview()
-                fromView.transform = CGAffineTransform.identity
-                fromView.alpha = 1
-                transitionContext.completeTransition(success)
-            }
+        let isRight = toIndex > fromIndex
+        let offset = isRight ? frame.width : -frame.width
+
+        // 초기 상태 설정
+        toVC.view.frame = frame
+        toVC.view.transform = CGAffineTransform(translationX: offset, y: 0)
+        container.addSubview(toVC.view)
+
+        UIView.animate(withDuration: transitionDuration, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8, options: [.curveEaseInOut]) {
+            fromVC.view.transform = CGAffineTransform(translationX: -offset * 0.3, y: 0)
+            fromVC.view.alpha = 0.7
+            toVC.view.transform = .identity
+            toVC.view.alpha = 1
+        } completion: { finished in
+            // 상태 복원
+            fromVC.view.transform = .identity
+            fromVC.view.alpha = 1
+            transitionContext.completeTransition(finished)
         }
     }
-    
-    func getIndex(forViewController vc: UIViewController) -> Int? {
-        guard let viewControllers = self.viewControllers else { return nil }
-        for (index, viewController) in viewControllers.enumerated() {
-            if viewController == vc { return index }
-        }
-        return nil
+
+    private func getIndex(for vc: UIViewController) -> Int? {
+        viewControllers?.firstIndex(where: { $0 == vc })
     }
 }

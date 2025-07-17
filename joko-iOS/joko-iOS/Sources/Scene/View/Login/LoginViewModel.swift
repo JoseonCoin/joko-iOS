@@ -160,7 +160,7 @@ public class LoginViewModel: BaseViewModel {
     // MARK: - 테스트: 퀴즈 ID API 호출
 
     private func testFetchQuizIds() {
-        let quizProvider = MoyaProvider<QuizIdAPI>()
+        let quizProvider = MoyaProvider<QuizAPI>()
         quizProvider.request(.fetchQuizIds) { result in
             switch result {
             case .success(let response):

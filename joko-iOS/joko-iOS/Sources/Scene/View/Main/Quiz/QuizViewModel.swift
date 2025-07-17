@@ -1,25 +1,25 @@
-import Foundation
 import RxSwift
-import RxCocoa
 import Moya
+import RxCocoa
 
 public class QuizViewModel: BaseViewModel {
     private let disposeBag = DisposeBag()
-        private let provider = MoyaProvider<QuizIdAPI>(plugins: [MoyaLoggingPlugin()])
+    private let provider = MoyaProvider<QuizAPI>(plugins: [MoyaLoggingPlugin()])
     
-
     public struct Input {
         let fetchTrigger: Observable<Void>
+        let submitTrigger: Observable<(quizId: Int, selectedIndex: Int, userId: Int)>
     }
-
+    
     public struct Output {
         let quizIds: Driver<[Int]>
         let quiz: Driver<Quiz>
+        let submitResult: Driver<QuizSubmitResponse>
     }
-
+    
     public func transform(input: Input) -> Output {
         let quizIdsRelay = BehaviorRelay<[Int]>(value: [])
-
+        
         let quizIds = input.fetchTrigger
             .flatMapLatest { [weak self] _ -> Observable<[Int]> in
                 guard let self = self else { return .just([]) }
@@ -31,7 +31,7 @@ public class QuizViewModel: BaseViewModel {
             }
             .do(onNext: { quizIdsRelay.accept($0) })
             .asDriver(onErrorJustReturn: [])
-
+        
         let quiz = quizIdsRelay
             .filter { !$0.isEmpty }
             .map { $0[0] }
@@ -46,7 +46,20 @@ public class QuizViewModel: BaseViewModel {
                     )
             }
             .asDriver(onErrorDriveWith: .empty())
-
-        return Output(quizIds: quizIds, quiz: quiz)
+        
+        let submitResult = input.submitTrigger
+            .flatMapLatest { [weak self] (quizId, selectedIndex, userId) -> Observable<QuizSubmitResponse> in
+                guard let self = self else { return .empty() }
+                return self.provider.rx.request(.postQuizSubmit(quizId: quizId, selectedIndex: selectedIndex, userId: userId))
+                    .filterSuccessfulStatusCodes()
+                    .map(QuizSubmitResponse.self)
+                    .asObservable()
+                    .catchAndReturn(
+                        QuizSubmitResponse(correct: false, correctAnswer: "", explanation: "제출 실패", coinReward: 0)
+                    )
+            }
+            .asDriver(onErrorDriveWith: .empty())
+        
+        return Output(quizIds: quizIds, quiz: quiz, submitResult: submitResult)
     }
 }

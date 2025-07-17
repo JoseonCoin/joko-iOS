@@ -12,7 +12,7 @@ struct Quiz: Decodable {
     let question: String
     let options: [String]
     let coin: Int
-    let imageUrl: String
+    let imageUrl: String?  // 옵셔널로 변경
     
     enum CodingKeys: String, CodingKey {
         case quizId = "id"

@@ -7,10 +7,9 @@ import RxCocoa
 final class QuizViewController: BaseViewController<QuizViewModel>, UICollectionViewDataSource, UICollectionViewDelegate {
     
     private let fetchTrigger = PublishRelay<Void>()
-    private let submitTrigger = PublishRelay<(quizId: Int, selectedIndex: Int, userId: Int)>()
+    private let submitTrigger = PublishRelay<(quizId: Int, selectedIndex: Int)>()
     private var quizIds: [Int] = []
     private var currentQuiz: Quiz?
-    private var userId: Int = 1 // 기본값 설정, 실제로는 로그인 시 받아온 값을 사용
 
     private let coinPriceLabel = UILabel().then {
         $0.font = .JokoFont(.title3)
@@ -21,12 +20,16 @@ final class QuizViewController: BaseViewController<QuizViewModel>, UICollectionV
     private let quizImageView = UIImageView().then {
         $0.backgroundColor = .gray500
         $0.layer.cornerRadius = 24
+        $0.contentMode = .scaleAspectFill
+        $0.clipsToBounds = true
     }
     
     private let questionLabel = UILabel().then {
         $0.font = .JokoFont(.title2)
         $0.text = "문제 불러오는 중..."
         $0.textColor = .white1
+        $0.numberOfLines = 0
+        $0.textAlignment = .center
     }
     
     private lazy var oxCollectionView: UICollectionView = {
@@ -45,15 +48,7 @@ final class QuizViewController: BaseViewController<QuizViewModel>, UICollectionV
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        fetchUserId() // 유저 아이디를 먼저 가져옴
         fetchTrigger.accept(())
-    }
-    
-    // 유저 아이디를 가져오는 메서드 (기존 코드에서 추출)
-    private func fetchUserId() {
-        // 여기서는 로그에 보인 userId가 1이므로 하드코딩
-        // 실제로는 UserAPI를 통해 가져와야 함
-        self.userId = 1
     }
 
     internal override func bind() {
@@ -67,36 +62,68 @@ final class QuizViewController: BaseViewController<QuizViewModel>, UICollectionV
             .drive(onNext: { [weak self] ids in
                 guard let self = self else { return }
                 self.quizIds = ids
-                print("Fetched Quiz IDs: \(ids)")
+                print("📋 Quiz IDs received in VC: \(ids)")
             })
             .disposed(by: disposeBag)
 
         output.quiz
             .drive(onNext: { [weak self] quiz in
                 guard let self = self else { return }
+                print("📝 Quiz received in VC: \(quiz.question)")
                 self.currentQuiz = quiz
-                self.questionLabel.text = quiz.question
-                self.coinPriceLabel.text = " \(quiz.coin)조코"
-                
-                if let url = URL(string: quiz.imageUrl) {
-                    DispatchQueue.global().async {
-                        if let data = try? Data(contentsOf: url),
-                           let image = UIImage(data: data) {
-                            DispatchQueue.main.async {
-                                self.quizImageView.image = image
-                            }
-                        }
-                    }
-                }
+                self.updateUI(with: quiz)
             })
             .disposed(by: disposeBag)
         
         output.submitResult
             .drive(onNext: { [weak self] result in
                 guard let self = self else { return }
+                print("✅ Submit result received in VC: \(result)")
                 self.handleSubmitResult(result)
             })
             .disposed(by: disposeBag)
+    }
+    
+    private func updateUI(with quiz: Quiz) {
+        DispatchQueue.main.async {
+            self.questionLabel.text = quiz.question
+            self.coinPriceLabel.text = "\(quiz.coin)조코"
+            
+            // 이미지 처리 - imageUrl이 옵셔널이므로 안전하게 처리
+            if let imageUrl = quiz.imageUrl, !imageUrl.isEmpty {
+                self.loadImage(from: imageUrl)
+            } else {
+                print("ℹ️ No image URL provided, using default background")
+                self.quizImageView.image = nil
+                self.quizImageView.backgroundColor = .gray500
+            }
+            
+            print("🎨 UI updated with quiz: \(quiz.question)")
+        }
+    }
+    
+    private func loadImage(from urlString: String) {
+        guard let url = URL(string: urlString) else {
+            print("❌ Invalid image URL: \(urlString)")
+            return
+        }
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                let data = try Data(contentsOf: url)
+                if let image = UIImage(data: data) {
+                    DispatchQueue.main.async {
+                        self.quizImageView.image = image
+                        print("✅ Image loaded successfully")
+                    }
+                }
+            } catch {
+                print("❌ Image load error: \(error)")
+                DispatchQueue.main.async {
+                    self.quizImageView.backgroundColor = .gray500
+                }
+            }
+        }
     }
     
     private func handleSubmitResult(_ result: QuizSubmitResponse) {
@@ -112,6 +139,7 @@ final class QuizViewController: BaseViewController<QuizViewModel>, UICollectionV
         let alert = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "확인", style: .default) { _ in
             // 다음 문제로 이동하거나 다른 액션 수행
+            print("🔄 Alert dismissed")
         })
         present(alert, animated: true)
     }
@@ -140,6 +168,7 @@ final class QuizViewController: BaseViewController<QuizViewModel>, UICollectionV
         questionLabel.snp.makeConstraints {
             $0.top.equalTo(quizImageView.snp.bottom).offset(32)
             $0.centerX.equalToSuperview()
+            $0.leading.trailing.equalToSuperview().inset(20)
         }
         
         oxCollectionView.snp.makeConstraints {
@@ -164,9 +193,13 @@ final class QuizViewController: BaseViewController<QuizViewModel>, UICollectionV
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let currentQuiz = currentQuiz else { return }
+        guard let currentQuiz = currentQuiz else {
+            print("❌ No current quiz available")
+            return
+        }
 
         let selectedIndex = indexPath.item
-        submitTrigger.accept((quizId: currentQuiz.quizId, selectedIndex: selectedIndex, userId: userId))
+        print("👆 Selected option \(selectedIndex) for quiz \(currentQuiz.quizId)")
+        submitTrigger.accept((quizId: currentQuiz.quizId, selectedIndex: selectedIndex))
     }
 }

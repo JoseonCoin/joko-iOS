@@ -73,10 +73,11 @@ public class ShopViewModel: BaseViewModel {
         
         currentRequest = shopService.fetchAllItems()
             .subscribe(
-                onSuccess: { [weak self] items in
-                    print("🟢 [ShopViewModel] Successfully loaded \(items.count) items")
+                onSuccess: { [weak self] rankItemGroups in
+                    print(" [ShopViewModel] Successfully loaded \(rankItemGroups.count) rank groups")
+                    let allItems = rankItemGroups.flatMap { $0.items }
                     self?.isLoadingRelay.accept(false)
-                    self?.shopItemsRelay.accept(items)
+                    self?.shopItemsRelay.accept(allItems)
                 },
                 onFailure: { [weak self] error in
                     print("🔴 [ShopViewModel] Load failed: \(error)")

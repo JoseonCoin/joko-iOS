@@ -4,7 +4,6 @@ import RxCocoa
 import Moya
 import RxMoya
 
-// MARK: - Shop Item Model
 struct ShopItem: Codable {
     let id: Int
     let name: String
@@ -16,7 +15,6 @@ struct ShopItem: Codable {
     }
 }
 
-// MARK: - Shop API
 enum ShopAPI {
     case getAllItems
 }

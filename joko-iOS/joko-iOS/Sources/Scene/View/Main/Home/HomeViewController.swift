@@ -341,18 +341,30 @@ class ItemCollectionViewCell: UICollectionViewCell {
             itemImageView.alpha = 0.5
         }
         
-        // Kingfisher 없이 이미지 로드
-        if let url = URL(string: item.imageUrl) {
-            itemImageView.image = UIImage(named: "placeholder_item")
-            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-                if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
-                    DispatchQueue.main.async {
-                        self?.itemImageView.image = image
+        // ✅ 특정 아이템 이름에 따라 로컬 이미지 지정
+        switch item.name {
+        case "허름한 옷":
+            itemImageView.image = UIImage(named: "clothes2")?.withRenderingMode(.alwaysOriginal)
+            
+        case "작은 호미":
+            itemImageView.image = UIImage(named: "scythe")?.withRenderingMode(.alwaysOriginal)
+            
+        case "박":
+            itemImageView.image = UIImage(named: "ppack")?.withRenderingMode(.alwaysOriginal)
+            
+        default:
+            // 그 외에는 네트워크에서 이미지 로딩
+            if let url = URL(string: item.imageUrl) {
+                itemImageView.image = UIImage(named: "placeholder_item")?.withRenderingMode(.alwaysOriginal)
+                DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                    if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
+                        DispatchQueue.main.async {
+                            self?.itemImageView.image = image
+                        }
                     }
                 }
+            } else {
+                itemImageView.image = UIImage(named: "placeholder_item")?.withRenderingMode(.alwaysOriginal)
             }
-        } else {
-            itemImageView.image = UIImage(named: "placeholder_item")
         }
-    }
-}
+    }}
